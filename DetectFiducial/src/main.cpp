@@ -8,13 +8,14 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv/cv.h>
 #include "GaborFilter.h"
+#include "ConnectedComponents.h"
 #include <iostream>
 
 using namespace cv;
 using namespace std;
 
-std::vector<std::vector<Point>> & findConnectedComponents(Mat &);
-int main(int argc, char *argv[])
+void findConnectedComponents(Mat &, vector<vector<Point> > & );
+int main(int argc, char* argv[])
 {
 	if(argc < 2){
 		cout<<"Usage:detectFiducial <filename>\n";
@@ -29,11 +30,13 @@ int main(int argc, char *argv[])
 	//Apply Gabor Filter on input image
 
 	GaborFilter gbFilter;
-	Mat gaborOutput;
-	gaborOutput = gbFilter.filter(input);
-
+	Mat gaborOutput(input.size(), CV_8UC1);
+	gbFilter.filter(input, gaborOutput);
+	imshow("gabour output", gaborOutput);
+	waitKey();
 	//Find Connected components in Gabor output
-	//std::vector<Point> connectedComponents = findConnectedComponents(gaborOutput);
+	vector<vector<Point> > connectedComponents;
+	findConnectedComponents(gaborOutput, connectedComponents);
 
 	//Cluster the connected components
 
@@ -44,7 +47,26 @@ int main(int argc, char *argv[])
 	//Classify the detected code
 }
 
-std::vector<std::vector<Point>> & findConnectedComponents(Mat &binaryImage){
-	std::vector<Point> out;
-	return out;
+void findConnectedComponents(Mat &binaryImage, vector< vector<Point> > &out){
+//	vector<Vec4i> hierarchy;
+//	findContours( binaryImage, out, hierarchy, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE );
+//	Mat dst = Mat::zeros(binaryImage.size(), CV_8UC3);
+//
+//	if( !out.empty() && !hierarchy.empty() )
+//	{
+//		// iterate through all the top-level contours,
+//		// draw each connected component with its own random color
+//		int idx = 0;
+//		for( ; idx >= 0; idx = hierarchy[idx][0] )
+//		{
+//			Scalar color( (rand()&255), (rand()&255), (rand()&255) );
+//			drawContours( dst, out, idx, color, CV_FILLED, 8, hierarchy );
+//		}
+//	}
+//
+//	imshow( "Connected Components", dst );
+	Mat components(binaryImage.size(), CV_8UC1);
+	connectedComponents(binaryImage, components, 4, CV_16U);
+	imshow( "Connected Components", components);
+	waitKey();
 }

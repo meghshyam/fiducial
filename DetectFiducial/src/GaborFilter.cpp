@@ -18,33 +18,36 @@ GaborFilter::~GaborFilter() {
 	// TODO Auto-generated destructor stub
 }
 
-Mat& GaborFilter::filter(Mat &input){
-	Size ksize(16,16);
+void GaborFilter::filter(Mat &input, Mat &gaborOutput){
+	Size ksize(64,64);
 	double sigma, theta, lambd, gamma, psi1, psi2;
 	int ktype = CV_64F;
-	sigma = 4.49;
+	int bw =1;
 	lambd  = 8; theta   = 0;
 	psi1     = 0; psi2 =  M_PI/2;
 	gamma   = 0.5;
-	Mat output[8];
+	sigma = lambd/M_PI*sqrt(log(2)/2)*(pow(2,bw)+1)/(pow(2,bw)-1);
 	Mat final_output;
+	Mat inputGray, output[8];
 	imshow("input", input);
+	cvtColor(input, inputGray, CV_RGB2GRAY);
 	for(int i=0; i<8; i++)
 	{
-		Mat kernel1 = getGaborKernel(ksize,sigma,theta,lambd,gamma,psi1/2);
-		Mat output1, output_color;
-		filter2D(input, output1, CV_32F, kernel1);
-		theta += 45*M_PI/180;
-		pow(output1, 2, output_color);
-		cvtColor(output_color, output[i], CV_RGB2GRAY );
+		Mat output1, output2, magOutput;
+		Mat kernel1 = getGaborKernel(ksize,sigma,theta,lambd,gamma,psi1);
+		filter2D(inputGray, output1, CV_32F, kernel1);
+		Mat kernel2 = getGaborKernel(ksize,sigma,theta,lambd,gamma,psi2);
+		filter2D(inputGray, output2, CV_32F, kernel2);
+		magnitude(output1, output2, magOutput);
+		pow(magOutput, 2, output[i]);
 		if(i > 0)
 		{
 			add(final_output, output[i], final_output);
 		}else{
 			final_output = output[i];
 		}
+		theta += 45*M_PI/180;
 	}
-	final_output = final_output * (1.0/8.0);
 	pow(final_output, 0.5, final_output);
 	double minVal;
 	double maxVal;
@@ -53,8 +56,5 @@ Mat& GaborFilter::filter(Mat &input){
 
 	minMaxLoc( final_output, &minVal, &maxVal, &minLoc, &maxLoc );
 	final_output = final_output * (1.0/maxVal);
-	threshold(final_output, final_output, 0.3, 1, THRESH_BINARY);
-	imshow("gabor", final_output);
-	waitKey();
-	return final_output;
+	gaborOutput = final_output > 0.4;
 }

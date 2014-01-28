@@ -15,7 +15,7 @@ class GaborFilter {
 public:
 	GaborFilter();
 	virtual ~GaborFilter();
-	Mat& filter(Mat &);
+	void filter(Mat &, Mat&);
 };
 
 #endif /* GABORFILTER_H_ */

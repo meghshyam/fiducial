@@ -34,14 +34,27 @@
 \end{abstract}
 
 \section{Introduction}
+
 \subsection{Motivation}
+Tracking vehicle by an autonomous vehicle. \\
+Fiducials for tracking under motion blur.
+ 
 \section{Related Work}
 ARToolkit \cite{ARToolkit02} /ARTag \cite{Fiala05} \\
 Pi-Tag \cite{Pitag13} \\
 Blut \cite{Wu:2011}
-\section{Our Contribution}
-\subsection{Fiducial Detection}
 
+\section{Our Contribution}
+
+\subsection{Design of Fiducial}
+
+\subsection{Fiducial Detection Algorithm}
+Apply Gabor Filter on input image \\
+Find Connected components in Gabor output \\
+Cluster the connected components \\
+Merge the clusters \\
+Detect code in the bounding box \\
+Classify the detected code 
 
 \section{Experimental Results}
 
@@ -49,17 +62,7 @@ Blut \cite{Wu:2011}
 
 \section{Future Work}
 
-
 \bibliographystyle{splncs}
 \bibliography{egbib}
 
-\clearpage\mbox{}Page \thepage\ of the manuscript.
-\clearpage\mbox{}Page \thepage\ of the manuscript.
-\clearpage\mbox{}Page \thepage\ of the manuscript.
-\clearpage\mbox{}Page \thepage\ of the manuscript.
-\clearpage\mbox{}Page \thepage\ of the manuscript.
-\clearpage\mbox{}Page \thepage\ of the manuscript.
-This is the last page of the manuscript.
-\par\vfill\par
-Now we have reached the maximum size of the ECCV 2012 submission.
 \end{document}
