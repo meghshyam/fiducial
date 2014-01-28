@@ -13,7 +13,7 @@
 using namespace cv;
 using namespace std;
 
-std::vector<Mat>& findConnectedComponents(Mat &);
+std::vector<std::vector<Point>> & findConnectedComponents(Mat &);
 int main(int argc, char *argv[])
 {
 	if(argc < 2){
@@ -33,10 +33,18 @@ int main(int argc, char *argv[])
 	gaborOutput = gbFilter.filter(input);
 
 	//Find Connected components in Gabor output
-	//std::vector<Mat> connectedComponents = findConnectedComponents(gaborOutput);
+	//std::vector<Point> connectedComponents = findConnectedComponents(gaborOutput);
+
+	//Cluster the connected components
+
+	//Merge the clusters
+
+	//Detect code in the bounding box
+
+	//Classify the detected code
 }
 
-std::vector<Mat> & findConnectedComponents(Mat &binaryImage){
-	std::vector<Mat> out;
+std::vector<std::vector<Point>> & findConnectedComponents(Mat &binaryImage){
+	std::vector<Point> out;
 	return out;
 }

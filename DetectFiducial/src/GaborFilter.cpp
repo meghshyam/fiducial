@@ -22,7 +22,7 @@ Mat& GaborFilter::filter(Mat &input){
 	Size ksize(16,16);
 	double sigma, theta, lambd, gamma, psi1, psi2;
 	int ktype = CV_64F;
-	sigma = 8;
+	sigma = 4.49;
 	lambd  = 8; theta   = 0;
 	psi1     = 0; psi2 =  M_PI/2;
 	gamma   = 0.5;
@@ -31,7 +31,7 @@ Mat& GaborFilter::filter(Mat &input){
 	imshow("input", input);
 	for(int i=0; i<8; i++)
 	{
-		Mat kernel1 = getGaborKernel(ksize,sigma,theta,lambd,gamma,psi2);
+		Mat kernel1 = getGaborKernel(ksize,sigma,theta,lambd,gamma,psi1/2);
 		Mat output1, output_color;
 		filter2D(input, output1, CV_32F, kernel1);
 		theta += 45*M_PI/180;
