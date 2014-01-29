@@ -43,6 +43,7 @@
 //
 #include <opencv/cv.h>>
 #include <vector>
+#include "ConnectedComponents.h"
 
 struct NoOp{
 	NoOp(){
@@ -308,7 +309,7 @@ int connectedComponents_sub1(const cv::Mat &I, cv::Mat &L, int connectivity, Sta
 	return -1;
 }
 
-extern int connectedComponents(cv::Mat img, cv::Mat labels, int connectivity, int ltype){
+extern int connectedComponents(cv::Mat &img, cv::Mat &labels, int connectivity, int ltype){
 	NoOp sop;
 	if(ltype == CV_16U){
 		return connectedComponents_sub1(img, labels, connectivity, sop);
@@ -320,3 +321,65 @@ extern int connectedComponents(cv::Mat img, cv::Mat labels, int connectivity, in
 	}
 }
 
+struct CCStatsOp{
+        cv::Mat *statsv;
+        cv::Mat *centroidsv;
+        std::vector<Point2ui64> integrals;
+
+        CCStatsOp(cv::Mat *_statsv, cv::Mat *_centroidsv): statsv(_statsv), centroidsv(_centroidsv){
+        }
+        inline
+        void init(int nlabels){
+            (*statsv).create(cv::Size(CC_STAT_MAX, nlabels), cv::DataType<int>::type);
+            (*centroidsv).create(cv::Size(2, nlabels), cv::DataType<double>::type);
+
+            for(int l = 0; l < (int) nlabels; ++l){
+                int *row = (int *) &(*statsv).at<int>(l, 0);
+                row[CC_STAT_LEFT] = INT_MAX;
+                row[CC_STAT_TOP] = INT_MAX;
+                row[CC_STAT_WIDTH] = INT_MIN;
+                row[CC_STAT_HEIGHT] = INT_MIN;
+                row[CC_STAT_AREA] = 0;
+            }
+            integrals.resize(nlabels, Point2ui64(0, 0));
+        }
+        void operator()(int r, int c, int l){
+            int *row = &(*statsv).at<int>(l, 0);
+            row[CC_STAT_LEFT] = MIN(row[CC_STAT_LEFT], c);
+            row[CC_STAT_WIDTH] = MAX(row[CC_STAT_WIDTH], c);
+            row[CC_STAT_TOP] = MIN(row[CC_STAT_TOP], r);
+            row[CC_STAT_HEIGHT] = MAX(row[CC_STAT_HEIGHT], r);
+            row[CC_STAT_AREA]++;
+            Point2ui64 &integral = integrals[l];
+            integral.x += c;
+            integral.y += r;
+        }
+        void finish(){
+            for(int l = 0; l < (*statsv).rows; ++l){
+                int *row = &(*statsv).at<int>(l, 0);
+                row[CC_STAT_WIDTH] = row[CC_STAT_WIDTH] - row[CC_STAT_LEFT] + 1;
+                row[CC_STAT_HEIGHT] = row[CC_STAT_HEIGHT] - row[CC_STAT_TOP] + 1;
+
+                Point2ui64 &integral = integrals[l];
+                double *centroid = &(*centroidsv).at<double>(l, 0);
+                double area = ((unsigned*)row)[CC_STAT_AREA];
+                centroid[0] = double(integral.x) / area;
+                centroid[1] = double(integral.y) / area;
+            }
+        }
+    };
+
+
+extern int connectedComponentsWithStats(cv::Mat &img, cv::Mat &labels, cv::Mat &statsv,
+		cv::Mat &centroids, int connectivity, int ltype)
+{
+    CCStatsOp sop(&statsv, &centroids);
+    if(ltype == CV_16U){
+        return connectedComponents_sub1(img, labels, connectivity, sop);
+    }else if(ltype == CV_32S){
+        return connectedComponents_sub1(img, labels, connectivity, sop);
+    }else{
+        CV_Error(CV_StsUnsupportedFormat, "the type of labels must be 16u or 32s");
+        return 0;
+    }
+}
