@@ -29,7 +29,6 @@ void GaborFilter::filter(Mat &input, Mat &gaborOutput){
 	sigma = lambd/M_PI*sqrt(log(2)/2)*(pow(2,bw)+1)/(pow(2,bw)-1);
 	Mat final_output;
 	Mat inputGray, output[8];
-	imshow("input", input);
 	cvtColor(input, inputGray, CV_RGB2GRAY);
 	for(int i=0; i<8; i++)
 	{

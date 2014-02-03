@@ -16,8 +16,8 @@ using namespace cv;
 using namespace std;
 
 void findConnectedComponents(Mat &, Mat & );
-void doCluster(Mat&, Mat&);
-float distL2(int * a, float *b, int dim);
+void doCluster(const Mat&, Mat&);
+float distL2(const float* a, const float *b, int dim);
 int main(int argc, char* argv[])
 {
 	if(argc < 2){
@@ -29,7 +29,6 @@ int main(int argc, char* argv[])
 
 	Mat input;
 	input = imread(argv[1], 1);
-
 	//Apply Gabor Filter on input image
 
 	GaborFilter gbFilter;
@@ -45,11 +44,12 @@ int main(int argc, char* argv[])
 	int numClusters = clusters.rows;
 	for(int i=0; i<numClusters; i++)
 	{
-		int * row = (int *)&clusters.at<int>(i,0);
+		float * row = (float *)&clusters.at<float>(i,0);
 		int x1 = row[0];
 		int y1 = row[1];
 		int x2 = row[2];
 		int y2 = row[3];
+		//cout<<x1<<","<<y1<<","<<x2<<","<<y2<<"\n";
 		Point pt1(x1,y1), pt2(x2,y2);
 		rectangle(input, pt1, pt2, Scalar(0,255,0) );
 	}
@@ -66,8 +66,8 @@ void findConnectedComponents(Mat &binaryImage, Mat &out){
 	Mat components(binaryImage.size(), CV_8UC1);
 	//connectedComponents(binaryImage, components, 4, CV_16U);
 	int numLabels = connectedComponentsWithStats(binaryImage, components, stats, centroids, 4, CV_16U);
-	cout<<"Number of components:"<<numLabels-1<<"\n";
-	out.create(numLabels-1, 4, DataType<int>::type);
+	out.create(numLabels-1, 4, DataType<float>::type);
+	int k=0;
 	for(int i=1; i<numLabels; i++)
 	{
 		//cout<<"area = "<<stats.at<int>(i, CC_STAT_AREA)<<"\n";
@@ -79,39 +79,41 @@ void findConnectedComponents(Mat &binaryImage, Mat &out){
 			int y1 = stats.at<int>(i, CC_STAT_TOP);
 			int x2 = x1 + stats.at<int>(i, CC_STAT_WIDTH);
 			int y2 = y1 + stats.at<int>(i, CC_STAT_HEIGHT);
-			//Point pt1(x1,y1), pt2(x2,y2);
-			int * row = (int *)&out.at<int>(i-1,0);
-			row[0] = x1; row[1] = y1; row[2] = x2; row[3] = y2;
-			//rectangle(binaryImage, pt1, pt2, Scalar(255,0,0) );
+			float * row = (float*)&out.at<float>(k,0);
+			k++;
+			row[0] = (float)x1; row[1] = (float)y1; row[2] = (float)x2; row[3] = (float)y2;
+			/*Point pt1(x1,y1), pt2(x2,y2);
+			rectangle(binaryImage, pt1, pt2, Scalar(255,0,0) );*/
 		}
 	}
+	out = out.rowRange(cv::Range(0,k-1));
 }
 
-void doCluster(Mat &connectedComponents, Mat& clusters)
+void doCluster(const Mat &connectedComponents, Mat& clusters)
 {
-	cvflann::KMeansIndexParams kmean_params(32, 100);
 	int numElements = connectedComponents.rows;
+	cvflann::KMeansIndexParams kmean_params(10, 30, cvflann::CENTERS_KMEANSPP);
 	Mat centers(numElements, 4, CV_32F);
-	int true_number_clusters = cv::flann::hierarchicalClustering<int, L2<float> >(connectedComponents, centers, kmean_params );
+	int true_number_clusters = cv::flann::hierarchicalClustering<cvflann::L2<float> >(connectedComponents, centers, kmean_params);
 	// since you get less clusters than you specified we can also truncate our matrix.
 	centers = centers.rowRange(cv::Range(0,true_number_clusters));
 
-	int *clusterId = new int[true_number_clusters];
+	int *clusterId = new int[numElements];
 	int *firstMember = new int[true_number_clusters];
 	for(int i=0; i<true_number_clusters; i++)
 	{
 		firstMember[i] = 0;
 	}
-	clusters.create(true_number_clusters, 4, DataType<int>::type);
+	clusters.create(true_number_clusters, 4, DataType<float>::type);
 
 	for(int i=0; i<numElements; i++)
 	{
-		int * row = (int *)&connectedComponents.at<int>(i,0);
-		float * centre = (float *)&centers.at<int>(0,0);
+		float * row = (float *)&connectedComponents.at<float>(i,0);
+		float * centre = (float *)&centers.at<float>(0,0);
 		int minIndex = 0;
 		float minValue = distL2(row, centre, 4);
 		for(int j=1; j<true_number_clusters; j++){
-			centre = (float *)&centers.at<int>(j,0);
+			centre = (float *)&centers.at<float>(j,0);
 			float dist = distL2(row, centre, 4);
 			if(dist < minValue)
 			{
@@ -120,7 +122,7 @@ void doCluster(Mat &connectedComponents, Mat& clusters)
 			}
 		}
 		clusterId[i] = minIndex;
-		int *cluster= (int*) &clusters.at<int>(minIndex,0);
+		float *cluster= (float*) &clusters.at<float>(minIndex,0);
 		if(firstMember[minIndex] == 0)
 		{
 			firstMember[minIndex] = 1;
@@ -140,9 +142,12 @@ void doCluster(Mat &connectedComponents, Mat& clusters)
 				cluster[3] = row[3];
 		}
 	}
+	delete(firstMember);
+	delete(clusterId);
+	centers.release();
 }
 
-float distL2(int * a, float *b, int dim)
+float distL2(const float * a, const float *b, int dim)
 {
 	float distance=0;
 	for(int i=0; i<dim; i++){
