@@ -40,10 +40,10 @@ Tracking vehicle by an autonomous vehicle. \\
 Fiducials for tracking under motion blur.
  
 \section{Related Work}
-ARToolkit \cite{ARToolkit02} /ARTag \cite{Fiala05} \\
-Circular Data Matrix Fiducial System \cite{NaimarkF02}
-Reliable Fiducial Detection in Natural Scenes \cite{ClausF04}
-RUNE-Tag \cite{runetag11}
+ARToolkit \cite{ARToolkit02} \cite{kato-artoolkit} /ARTag \cite{Fiala05} \\
+Circular Data Matrix Fiducial System \cite{NaimarkF02} \\
+Reliable Fiducial Detection in Natural Scenes \cite{ClausF04}\\
+RUNE-Tag \cite{runetag11} \\
 Pi-Tag \cite{Pitag13} \\
 Blut \cite{Wu:2011}
 
@@ -52,19 +52,33 @@ Blut \cite{Wu:2011}
 \subsection{Design of Fiducial}
 
 \subsection{Fiducial Detection Algorithm}
-Apply Gabor Filter on input image \\
-Find Connected components in Gabor output \\
-Cluster the connected components \\
-Merge the clusters \\
-Detect code in the bounding box \\
-Classify the detected code by the classifer trained on standards. 
+\begin{itemize}
+  \item Apply Gabor Filter on input image
+  \item Find Connected components in Gabor output
+  \item Cluster the connected components in bounding box
+  \item Detect code in the bounding box
+  \begin{itemize}
+    \item Run PCA on Gabor output in bounding box
+    \item Find intensity profile along first principal component passing through
+    centroid
+    \item If there are less than four black to white transitions in the
+    intensity profile, ignore the bouding box
+    \item Otherwise, classify the detected code by the classifer trained on
+    standards.
+  \end{itemize}
+\end{itemize}
 
 \section{Experimental Results}
+\subsection{Comparison}
+We will compare our results with standard fiducials such as ARTag. Also, we will
+compare our results with Blur driven tracker.
+\subsubsection{Comparison with ARTag}
+\subsubsection{Comparison with Blut} 
 
 \section{Conclusion}
 
 \section{Future Work}
-
+Pose Estimation
 \bibliographystyle{splncs}
 \bibliography{egbib}
 
