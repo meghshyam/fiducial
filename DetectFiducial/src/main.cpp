@@ -10,14 +10,33 @@
 #include <opencv/cv.h>
 #include "GaborFilter.h"
 #include "ConnectedComponents.h"
+#include <dataanalysis.h>
+#include <ap.h>
 #include <iostream>
 
 using namespace cv;
 using namespace std;
+using namespace alglib;
 
-void findConnectedComponents(Mat &, Mat & );
+void findConnectedComponents(const Mat &, Mat & );
 void doCluster(const Mat&, Mat&);
-float distL2(const float* a, const float *b, int dim);
+void getPoints(const Mat &binOutput, int left, int top, int right, int bottom, Mat &outPts);
+bool detectCode(const Mat &pts, int left, int top, int right, int bottom, Mat &input, vector<float>& intensity_profile );
+
+void processEntry(int index, int numObs, int clusterIndex, integer_2d_array Z, int * clusterid, int *done)
+{
+	for(int j=0; j<2; j++){
+		int a = Z(index,j);
+		if (a >= numObs){
+			a-= numObs;
+			done[a] = 1;
+			processEntry(a, numObs, clusterIndex, Z, clusterid, done);
+		}else{
+			clusterid[a] = clusterIndex;
+		}
+	}
+}
+
 int main(int argc, char* argv[])
 {
 	if(argc < 2){
@@ -26,11 +45,10 @@ int main(int argc, char* argv[])
 	}
 
 	//Read image
-
 	Mat input;
 	input = imread(argv[1], 1);
-	//Apply Gabor Filter on input image
 
+	//Apply Gabor Filter on input image
 	GaborFilter gbFilter;
 	Mat gaborOutput(input.size(), CV_8UC1);
 	gbFilter.filter(input, gaborOutput);
@@ -54,14 +72,169 @@ int main(int argc, char* argv[])
 		rectangle(input, pt1, pt2, Scalar(0,255,0) );
 	}
 
-	imshow("cluster output", input);
-	waitKey();
-	//Detect code in the bounding box
+	//imshow("cluster output", input);
 
-	//Classify the detected code
+
+	//Detect code in the bounding box
+	vector<float> intensity_profile;
+	bool found = false;
+	for(int i=0; i<numClusters; i++)
+	{
+		float * row = (float *)&clusters.at<float>(i,0);
+		int x1 = row[0];
+		int y1 = row[1];
+		int x2 = row[2];
+		int y2 = row[3];
+		Mat pts;
+		Point pt1(x1,y1), pt2(x2,y2);
+		rectangle(gaborOutput, pt1, pt2, Scalar(255,0,0) );
+		imshow("gabor", gaborOutput);
+		waitKey();
+		getPoints(gaborOutput, x1, y1, x2, y2, pts);
+		found = detectCode(pts, x1, y1, x2, y2, input, intensity_profile);
+		if(found)
+			break;
+	}
+	if(!found){
+		cout<<"Code not detected\n";
+	}else{
+		//Classify the detected code
+	}
+	waitKey();
 }
 
-void findConnectedComponents(Mat &binaryImage, Mat &out){
+bool detectCode(const Mat &pts, int left, int top, int right, int bottom, Mat &input, vector<float>& intensity_profile ){
+	int numPts = pts.rows;
+	int dim = pts.cols;
+	PCA pca(pts, Mat(), CV_PCA_DATA_AS_ROW, 2);
+	float * ptr = pca.eigenvectors.ptr<float>(0);
+	//vector<double> prin_comp(ptr, ptr + dim);
+	double slope = ptr[1]/ptr[0];
+	int centroid[2] = {0,0};
+	for(int i=0; i<numPts; i++){
+		centroid[0] += pts.at<float>(i,0);
+		centroid[1] += pts.at<float>(i,1);
+	}
+	centroid[0] /= numPts;
+	centroid[1] /= numPts;
+
+	vector<Point> upward_pts;
+	vector<Point> downward_pts;
+
+	bool increase_x = true;
+	if (abs(slope) > 1)
+	    increase_x = false;
+
+	if (increase_x){
+		int left_distance = centroid[0] - left;
+		int right_distance = right - centroid[0];
+		if (slope < 0){
+			for (int i = 0; i<right_distance; i++){
+				int x = centroid[0] + i;
+				int y = centroid[1]  + i*slope;
+				if(y >= top)
+					upward_pts.push_back(Point(x, y));
+				else
+					break;
+			}
+			for (int i = 1; i<left_distance; i++){
+				int x = centroid[0] - i;
+				int y = centroid[1] - i*slope;
+				if(y <= bottom)
+					downward_pts.push_back(Point(x, y));
+				else
+					break;
+			}
+		}//slope < 0
+		else{
+			for (int i = 0; i<left_distance; i++){
+				int x = centroid[0] - i;
+				int y = centroid[1] - i*slope;
+				if(y >= top)
+					upward_pts.push_back(Point(x, y));
+				else
+					break;
+			}
+			for (int i = 0; i<right_distance; i++){
+				int x = centroid[0] + i;
+				int y = centroid[1] + i*slope;
+				if(y <= bottom)
+					downward_pts.push_back(Point(x, y));
+				else
+					break;
+			}
+		}//slope > 0
+	}//} increase_x
+	else{
+		int up_distance = centroid[1]-top;
+		int down_distance = bottom - centroid[1];
+		if (slope < 0){
+			for (int i = 0; i< up_distance -1; i++){
+				int y = centroid[1] - i;
+				int x = centroid[0] - i/slope;
+				if(x <= right)
+					upward_pts.push_back(Point(x, y));
+				else
+					break;
+			}
+			for (int i = 1; i< down_distance; i++){
+				int y = centroid[1] + i;
+				int x = centroid[0] + i/slope;
+				if(x >= left)
+					downward_pts.push_back(Point(x, y));
+				else
+					break;
+			}
+		}
+		else{
+			for (int i = 0; i< up_distance -1; i++){
+				int y = centroid[1] - i;
+				int x = centroid[0] - i/slope;
+				if(x >= left)
+					upward_pts.push_back(Point(x, y));
+				else
+					break;
+
+			}
+			for (int i = 1; i< down_distance; i++){
+				int y = centroid[1] + i;
+				int x = centroid[0] + i/slope;
+				if(x <= right)
+					downward_pts.push_back(Point(x, y));
+				else
+					break;
+
+			}
+		}
+	}
+	if(upward_pts.size() > 0 && downward_pts.size() > 0){
+		Point first_pt = upward_pts.back();
+		Point last_pt = downward_pts.back();
+		line(input, first_pt, last_pt, Scalar(0,255,0));
+		imshow("lines", input);
+	}
+	return false;
+}
+
+void getPoints(const Mat &binOutput, int left, int top, int right, int bottom, Mat &outPts){
+	int rowIndex = 0;
+	int maxPts = (right-left+1)*(bottom-top+1);
+	outPts.create(maxPts, 2, DataType<float>::type);
+	for(int i=top; i<=bottom; i++)
+	{
+		uchar* row = (uchar*)&binOutput.at<uchar>(i,0);
+		for(int j=left; j<=right; j++){
+			if(row[j] != 0 ){
+				outPts.at<float>(rowIndex,0) = (float)j;
+				outPts.at<float>(rowIndex,1) = (float)i;
+				rowIndex++;
+			}
+		}
+	}
+	outPts = outPts.rowRange(cv::Range(0,rowIndex));
+}
+
+void findConnectedComponents(const Mat &binaryImage, Mat &out){
 	Mat stats, centroids;
 	Mat components(binaryImage.size(), CV_8UC1);
 	//connectedComponents(binaryImage, components, 4, CV_16U);
@@ -92,36 +265,93 @@ void findConnectedComponents(Mat &binaryImage, Mat &out){
 void doCluster(const Mat &connectedComponents, Mat& clusters)
 {
 	int numElements = connectedComponents.rows;
-	cvflann::KMeansIndexParams kmean_params(10, 30, cvflann::CENTERS_KMEANSPP);
+
+	/*cvflann::KMeansIndexParams kmean_params(10, 30, cvflann::CENTERS_KMEANSPP);
 	Mat centers(numElements, 4, CV_32F);
 	int true_number_clusters = cv::flann::hierarchicalClustering<cvflann::L2<float> >(connectedComponents, centers, kmean_params);
 	// since you get less clusters than you specified we can also truncate our matrix.
 	centers = centers.rowRange(cv::Range(0,true_number_clusters));
+	clusters.create(true_number_clusters, 4, DataType<float>::type);
+	 */
 
-	int *clusterId = new int[numElements];
-	int *firstMember = new int[true_number_clusters];
-	for(int i=0; i<true_number_clusters; i++)
+	real_2d_array input;
+	double* pContent = new double[numElements*4];
+	for (int i=0; i<numElements; i++){
+		float * row = (float *)&connectedComponents.at<float>(i,0);
+		for(int j =0; j<4; j++){
+			int index = i*4 + j;
+			pContent[index] = (double)row[j];
+		}
+	}
+
+	input.setcontent(numElements, 4, pContent);
+	int *clusterid = new int[numElements];
+
+	clusterizerstate s;
+	ahcreport rep;
+
+	clusterizercreate(s);
+	clusterizersetahcalgo(s,1);
+	clusterizersetpoints(s, input, 2);
+	clusterizerrunahc(s, rep);
+	integer_2d_array Z(rep.z);
+	real_1d_array dist(rep.mergedist);
+	int numRows = Z.rows();
+
+	int current_cluster_id = 0;
+	//float criteria = atof(argv[1]);
+	float criteria = 100;
+	int *done = new int[numRows];
+	for(int i=0; i<numRows; i++)
+	{
+		done[i] = 0;
+	}
+
+	int i=numRows-1;
+	while(i >= 0){
+		if(!done[i] && dist(i) <= criteria){
+			for(int j=0; j<2; j++){
+				int a = Z(i,j);
+				if (a >= numElements){
+					a-= numElements;
+					done[a] = 1;
+					processEntry(a, numElements, current_cluster_id, Z, clusterid, done);
+				}else{
+					clusterid[a] = current_cluster_id;
+				}
+			}
+			current_cluster_id++;
+		}else if(!done[i]){
+			for(int j=0; j<2; j++){
+				int a = Z(i,j);
+				if (a < numElements){
+					clusterid[a] = current_cluster_id;
+					current_cluster_id++;
+				}
+			}
+		}
+		i--;
+	}
+
+	int numClusters = current_cluster_id;
+	clusters.create(numClusters,4,DataType<float>::type);
+	int * firstMember = new int[numClusters];
+	for(int i=0; i<numClusters; i++)
 	{
 		firstMember[i] = 0;
 	}
-	clusters.create(true_number_clusters, 4, DataType<float>::type);
+/*
+	printf("Cluster INfo\n");
+	for(int i=0; i<numElements; i++)
+	{
+		printf("%d\n", clusterid[i]);
+	}
+*/
 
 	for(int i=0; i<numElements; i++)
 	{
+		int minIndex = clusterid[i];
 		float * row = (float *)&connectedComponents.at<float>(i,0);
-		float * centre = (float *)&centers.at<float>(0,0);
-		int minIndex = 0;
-		float minValue = distL2(row, centre, 4);
-		for(int j=1; j<true_number_clusters; j++){
-			centre = (float *)&centers.at<float>(j,0);
-			float dist = distL2(row, centre, 4);
-			if(dist < minValue)
-			{
-				minValue = dist;
-				minIndex = j;
-			}
-		}
-		clusterId[i] = minIndex;
 		float *cluster= (float*) &clusters.at<float>(minIndex,0);
 		if(firstMember[minIndex] == 0)
 		{
@@ -143,15 +373,5 @@ void doCluster(const Mat &connectedComponents, Mat& clusters)
 		}
 	}
 	delete(firstMember);
-	delete(clusterId);
-	centers.release();
-}
-
-float distL2(const float * a, const float *b, int dim)
-{
-	float distance=0;
-	for(int i=0; i<dim; i++){
-		distance += (a[i] - b[i])*(a[i] - b[i]);
-	}
-	return sqrt(distance);
+	delete(clusterid);
 }

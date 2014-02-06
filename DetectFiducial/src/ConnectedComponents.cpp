@@ -370,7 +370,7 @@ struct CCStatsOp{
     };
 
 
-extern int connectedComponentsWithStats(cv::Mat &img, cv::Mat &labels, cv::Mat &statsv,
+extern int connectedComponentsWithStats(const cv::Mat &img, cv::Mat &labels, cv::Mat &statsv,
 		cv::Mat &centroids, int connectivity, int ltype)
 {
     CCStatsOp sop(&statsv, &centroids);
