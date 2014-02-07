@@ -67,13 +67,9 @@ int main(int argc, char* argv[])
 		int y1 = row[1];
 		int x2 = row[2];
 		int y2 = row[3];
-		//cout<<x1<<","<<y1<<","<<x2<<","<<y2<<"\n";
 		Point pt1(x1,y1), pt2(x2,y2);
 		rectangle(input, pt1, pt2, Scalar(0,255,0) );
 	}
-
-	//imshow("cluster output", input);
-
 
 	//Detect code in the bounding box
 	vector<float> intensity_profile;
@@ -87,9 +83,11 @@ int main(int argc, char* argv[])
 		int y2 = row[3];
 		Mat pts;
 		Point pt1(x1,y1), pt2(x2,y2);
-		rectangle(gaborOutput, pt1, pt2, Scalar(255,0,0) );
-		imshow("gabor", gaborOutput);
-		waitKey();
+
+		  rectangle(gaborOutput, pt1, pt2, Scalar(255,0,0) );
+		  imshow("gabor", gaborOutput);
+		  waitKey();
+
 		getPoints(gaborOutput, x1, y1, x2, y2, pts);
 		found = detectCode(pts, x1, y1, x2, y2, input, intensity_profile);
 		if(found)
@@ -98,6 +96,7 @@ int main(int argc, char* argv[])
 	if(!found){
 		cout<<"Code not detected\n";
 	}else{
+		cout<<"Code detected\n";
 		//Classify the detected code
 	}
 	waitKey();
@@ -108,7 +107,6 @@ bool detectCode(const Mat &pts, int left, int top, int right, int bottom, Mat &i
 	int dim = pts.cols;
 	PCA pca(pts, Mat(), CV_PCA_DATA_AS_ROW, 2);
 	float * ptr = pca.eigenvectors.ptr<float>(0);
-	//vector<double> prin_comp(ptr, ptr + dim);
 	double slope = ptr[1]/ptr[0];
 	int centroid[2] = {0,0};
 	for(int i=0; i<numPts; i++){
@@ -118,101 +116,187 @@ bool detectCode(const Mat &pts, int left, int top, int right, int bottom, Mat &i
 	centroid[0] /= numPts;
 	centroid[1] /= numPts;
 
-	vector<Point> upward_pts;
-	vector<Point> downward_pts;
+	int centroid_pos[2] = {0, 0};
+	int centroid_neg[2] = {0, 0};
+	float slope_perp = -1/slope;
+	if (abs(slope_perp) <= 1){
+		centroid_pos[0] = centroid[0] + 5;
+		centroid_neg[0] = centroid[0] - 5;
+		centroid_pos[1] = centroid[1] + 5*slope_perp;
+		centroid_neg[1] = centroid[1] - 5*slope_perp;
+	}else{
+		centroid_pos[1] = centroid[1] + 5;
+		centroid_neg[1] = centroid[1] - 5;
+		centroid_pos[0] = centroid[0] + 5/slope_perp;
+		centroid_neg[0] = centroid[0] - 5/slope_perp;
+	}
 
-	bool increase_x = true;
-	if (abs(slope) > 1)
-	    increase_x = false;
+	int centroids[3][2];
+	centroids[0][0] = centroid_neg[0]; centroids[0][1] = centroid_neg[1];
+	centroids[1][0] = centroid[0]; centroids[1][1] = centroid[1];
+	centroids[2][0] = centroid_pos[0]; centroids[2][1] = centroid_pos[1];
 
-	if (increase_x){
-		int left_distance = centroid[0] - left;
-		int right_distance = right - centroid[0];
-		if (slope < 0){
-			for (int i = 0; i<right_distance; i++){
-				int x = centroid[0] + i;
-				int y = centroid[1]  + i*slope;
-				if(y >= top)
-					upward_pts.push_back(Point(x, y));
-				else
-					break;
-			}
-			for (int i = 1; i<left_distance; i++){
-				int x = centroid[0] - i;
-				int y = centroid[1] - i*slope;
-				if(y <= bottom)
-					downward_pts.push_back(Point(x, y));
-				else
-					break;
-			}
-		}//slope < 0
+	Mat grayInput(input.size(), CV_32FC1);
+	cvtColor(input, grayInput, CV_BGR2GRAY);
+
+	int numPtsPerLine[3];
+	float * intensities[3];
+	vector<Point> line_pts[3];
+
+	for(int index=0; index<3; index++)
+	{
+		vector<Point> upward_pts;
+		vector<Point> downward_pts;
+
+		bool increase_x = true;
+		if (abs(slope) > 1)
+			increase_x = false;
+
+		if (increase_x){
+			int left_distance = centroid[0] - left;
+			int right_distance = right - centroids[index][0];
+			if (slope < 0){
+				for (int i = 0; i<right_distance; i++){
+					int x = centroids[index][0] + i;
+					int y = centroids[index][1]  + i*slope;
+					if(y >= top)
+						upward_pts.push_back(Point(x, y));
+					else
+						break;
+				}
+				for (int i = 1; i<left_distance; i++){
+					int x = centroids[index][0] - i;
+					int y = centroids[index][1] - i*slope;
+					if(y <= bottom)
+						downward_pts.push_back(Point(x, y));
+					else
+						break;
+				}
+			}//slope < 0
+			else{
+				for (int i = 0; i<left_distance; i++){
+					int x = centroids[index][0] - i;
+					int y = centroids[index][1] - i*slope;
+					if(y >= top)
+						upward_pts.push_back(Point(x, y));
+					else
+						break;
+				}
+				for (int i = 0; i<right_distance; i++){
+					int x = centroids[index][0] + i;
+					int y = centroids[index][1] + i*slope;
+					if(y <= bottom)
+						downward_pts.push_back(Point(x, y));
+					else
+						break;
+				}
+			}//slope > 0
+		}//} increase_x
 		else{
-			for (int i = 0; i<left_distance; i++){
-				int x = centroid[0] - i;
-				int y = centroid[1] - i*slope;
-				if(y >= top)
-					upward_pts.push_back(Point(x, y));
-				else
-					break;
+			int up_distance = centroids[index][1]-top;
+			int down_distance = bottom - centroids[index][1];
+			if (slope < 0){
+				for (int i = 0; i< up_distance -1; i++){
+					int y = centroids[index][1] - i;
+					int x = centroids[index][0] - i/slope;
+					if(x <= right)
+						upward_pts.push_back(Point(x, y));
+					else
+						break;
+				}
+				for (int i = 1; i< down_distance; i++){
+					int y = centroids[index][1] + i;
+					int x = centroids[index][0] + i/slope;
+					if(x >= left)
+						downward_pts.push_back(Point(x, y));
+					else
+						break;
+				}
 			}
-			for (int i = 0; i<right_distance; i++){
-				int x = centroid[0] + i;
-				int y = centroid[1] + i*slope;
-				if(y <= bottom)
-					downward_pts.push_back(Point(x, y));
-				else
-					break;
-			}
-		}//slope > 0
-	}//} increase_x
-	else{
-		int up_distance = centroid[1]-top;
-		int down_distance = bottom - centroid[1];
-		if (slope < 0){
-			for (int i = 0; i< up_distance -1; i++){
-				int y = centroid[1] - i;
-				int x = centroid[0] - i/slope;
-				if(x <= right)
-					upward_pts.push_back(Point(x, y));
-				else
-					break;
-			}
-			for (int i = 1; i< down_distance; i++){
-				int y = centroid[1] + i;
-				int x = centroid[0] + i/slope;
-				if(x >= left)
-					downward_pts.push_back(Point(x, y));
-				else
-					break;
+			else{
+				for (int i = 0; i< up_distance -1; i++){
+					int y = centroids[index][1] - i;
+					int x = centroids[index][0] - i/slope;
+					if(x >= left)
+						upward_pts.push_back(Point(x, y));
+					else
+						break;
+
+				}
+				for (int i = 1; i< down_distance; i++){
+					int y = centroids[index][1] + i;
+					int x = centroids[index][0] + i/slope;
+					if(x <= right)
+						downward_pts.push_back(Point(x, y));
+					else
+						break;
+
+				}
 			}
 		}
-		else{
-			for (int i = 0; i< up_distance -1; i++){
-				int y = centroid[1] - i;
-				int x = centroid[0] - i/slope;
-				if(x >= left)
-					upward_pts.push_back(Point(x, y));
-				else
-					break;
 
+		if(upward_pts.size() > 0 && downward_pts.size() > 0){
+			Point first_pt = upward_pts.back();
+			Point last_pt = downward_pts.back();
+			line(input, first_pt, last_pt, Scalar(0,255,0));
+		}
+
+		reverse(upward_pts.begin(), upward_pts.end());
+		line_pts[index].insert(line_pts[index].end(), upward_pts.begin(), upward_pts.end());
+		line_pts[index].insert(line_pts[index].end(), downward_pts.begin(), downward_pts.end());
+		int totalPoints = upward_pts.size() + downward_pts.size();
+		intensities[index] = new float[totalPoints];
+		numPtsPerLine[index] = totalPoints;
+		for(int i=0; i<totalPoints; i++){
+			Point pt = line_pts[index][i];
+			intensities[index][i] = grayInput.at<float>(pt);
+		}
+	}
+
+
+	vector<int> ring_starts[3];
+	vector<int> ring_widths[3];
+	for(int i=0; i<3; i++){
+		int totalPoints = numPtsPerLine[i];
+		Mat profile(totalPoints, 1, CV_32FC1, &intensities[i]);
+		//Mat smoothProfile;
+		//boxFilter(profile, smoothProfile, CV_32FC1, Size(5,1));
+		Mat thresh_profile(profile.size(), DataType<float>::type);
+		threshold(profile, thresh_profile, 0.5, 1, CV_THRESH_BINARY);
+		bool start_ring = false;
+		totalPoints = thresh_profile.rows;
+		float * int_profile = thresh_profile.ptr<float>(0);
+		for(int j=1; j<totalPoints; j++){
+			int start,width;
+			int intensity1 = int_profile[j-1];
+			int intensity2 = int_profile[j];
+			if(  intensity1==0 && intensity2 == 1){
+				start_ring = true;
+				start = j;
+				Point pt = line_pts[i][j];
+				circle(input, pt,3,Scalar(255,0,0));
 			}
-			for (int i = 1; i< down_distance; i++){
-				int y = centroid[1] + i;
-				int x = centroid[0] + i/slope;
-				if(x <= right)
-					downward_pts.push_back(Point(x, y));
-				else
-					break;
-
+			if (start_ring && intensity2 == 0){
+				width = j - start;
+				ring_starts[i].push_back(start);
+				ring_widths[i].push_back(width);
+				start_ring = false;
 			}
 		}
 	}
-	if(upward_pts.size() > 0 && downward_pts.size() > 0){
-		Point first_pt = upward_pts.back();
-		Point last_pt = downward_pts.back();
-		line(input, first_pt, last_pt, Scalar(0,255,0));
-		imshow("lines", input);
+
+	imshow("lines", input);
+	waitKey();
+
+	int size1 = ring_starts[0].size();
+	int size2 = ring_starts[1].size();
+	int size3 = ring_starts[2].size();
+
+	if(size1 == size2 && size2 == size3){
+		if(size1 >= 4 )
+			return true;
 	}
+
 	return false;
 }
 
@@ -340,13 +424,13 @@ void doCluster(const Mat &connectedComponents, Mat& clusters)
 	{
 		firstMember[i] = 0;
 	}
-/*
+	/*
 	printf("Cluster INfo\n");
 	for(int i=0; i<numElements; i++)
 	{
 		printf("%d\n", clusterid[i]);
 	}
-*/
+	 */
 
 	for(int i=0; i<numElements; i++)
 	{
