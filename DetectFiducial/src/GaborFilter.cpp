@@ -9,6 +9,8 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv/highgui.h>
 #include <math.h>
+#include <iostream>
+using namespace std;
 GaborFilter::GaborFilter() {
 	// TODO Auto-generated constructor stub
 
@@ -29,7 +31,12 @@ void GaborFilter::filter(Mat &input, Mat &gaborOutput){
 	sigma = lambd/M_PI*sqrt(log(2)/2)*(pow(2,bw)+1)/(pow(2,bw)-1);
 	Mat final_output;
 	Mat inputGray, output[8];
-	cvtColor(input, inputGray, CV_RGB2GRAY);
+	if(input.channels() >=3 )
+		cvtColor(input, inputGray, CV_BGR2GRAY);
+	else
+		inputGray = input.clone();
+	//cout<<"Type of imageo:"<<inputGray.type()<<"\n";
+
 	for(int i=0; i<8; i++)
 	{
 		Mat output1, output2, magOutput;

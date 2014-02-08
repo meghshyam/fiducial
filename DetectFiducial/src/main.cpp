@@ -70,6 +70,8 @@ int main(int argc, char* argv[])
 		Point pt1(x1,y1), pt2(x2,y2);
 		rectangle(input, pt1, pt2, Scalar(0,255,0) );
 	}
+//	imshow("box",input);
+//	waitKey();
 
 	//Detect code in the bounding box
 	vector<float> intensity_profile;
@@ -83,11 +85,13 @@ int main(int argc, char* argv[])
 		int y2 = row[3];
 		Mat pts;
 		Point pt1(x1,y1), pt2(x2,y2);
+/*
 
 		  rectangle(gaborOutput, pt1, pt2, Scalar(255,0,0) );
 		  imshow("gabor", gaborOutput);
 		  waitKey();
 
+*/
 		getPoints(gaborOutput, x1, y1, x2, y2, pts);
 		found = detectCode(pts, x1, y1, x2, y2, input, intensity_profile);
 		if(found)
@@ -99,7 +103,6 @@ int main(int argc, char* argv[])
 		cout<<"Code detected\n";
 		//Classify the detected code
 	}
-	waitKey();
 }
 
 bool detectCode(const Mat &pts, int left, int top, int right, int bottom, Mat &input, vector<float>& intensity_profile ){
@@ -136,11 +139,16 @@ bool detectCode(const Mat &pts, int left, int top, int right, int bottom, Mat &i
 	centroids[1][0] = centroid[0]; centroids[1][1] = centroid[1];
 	centroids[2][0] = centroid_pos[0]; centroids[2][1] = centroid_pos[1];
 
-	Mat grayInput(input.size(), CV_32FC1);
-	cvtColor(input, grayInput, CV_BGR2GRAY);
+	Mat grayInput;//(input.size(), DataType<float>::type);
+	//cout<<"Type of image1:"<<grayInput.type()<<"\n";
+	if(input.channels() >=3 )
+		cvtColor(input, grayInput, CV_RGB2GRAY);
+	else
+		grayInput = input.clone();
+	//cout<<"Type of image1:"<<grayInput.type()<<"\n";
 
 	int numPtsPerLine[3];
-	float * intensities[3];
+	uchar * intensities[3];
 	vector<Point> line_pts[3];
 
 	for(int index=0; index<3; index++)
@@ -235,21 +243,23 @@ bool detectCode(const Mat &pts, int left, int top, int right, int bottom, Mat &i
 			}
 		}
 
-		if(upward_pts.size() > 0 && downward_pts.size() > 0){
+		/*if(upward_pts.size() > 0 && downward_pts.size() > 0){
 			Point first_pt = upward_pts.back();
 			Point last_pt = downward_pts.back();
 			line(input, first_pt, last_pt, Scalar(0,255,0));
-		}
+		}*/
 
 		reverse(upward_pts.begin(), upward_pts.end());
-		line_pts[index].insert(line_pts[index].end(), upward_pts.begin(), upward_pts.end());
+		line_pts[index] = upward_pts;
 		line_pts[index].insert(line_pts[index].end(), downward_pts.begin(), downward_pts.end());
 		int totalPoints = upward_pts.size() + downward_pts.size();
-		intensities[index] = new float[totalPoints];
+		intensities[index] = new uchar[totalPoints];
 		numPtsPerLine[index] = totalPoints;
+		bool first=true;
 		for(int i=0; i<totalPoints; i++){
 			Point pt = line_pts[index][i];
-			intensities[index][i] = grayInput.at<float>(pt);
+			uchar intensity_test = grayInput.at<uchar>(pt);
+			intensities[index][i] = intensity_test;
 		}
 	}
 
@@ -258,23 +268,24 @@ bool detectCode(const Mat &pts, int left, int top, int right, int bottom, Mat &i
 	vector<int> ring_widths[3];
 	for(int i=0; i<3; i++){
 		int totalPoints = numPtsPerLine[i];
-		Mat profile(totalPoints, 1, CV_32FC1, &intensities[i]);
+		Mat profile(totalPoints, 1, CV_8U, intensities[i]);
 		//Mat smoothProfile;
 		//boxFilter(profile, smoothProfile, CV_32FC1, Size(5,1));
-		Mat thresh_profile(profile.size(), DataType<float>::type);
-		threshold(profile, thresh_profile, 0.5, 1, CV_THRESH_BINARY);
+		Mat thresh_profile;
+		threshold(profile, thresh_profile, 127, 1, CV_THRESH_BINARY);
 		bool start_ring = false;
 		totalPoints = thresh_profile.rows;
-		float * int_profile = thresh_profile.ptr<float>(0);
+		uchar * int_profile = thresh_profile.ptr<uchar>(0);
 		for(int j=1; j<totalPoints; j++){
 			int start,width;
-			int intensity1 = int_profile[j-1];
-			int intensity2 = int_profile[j];
+			uchar intensity1 = int_profile[j-1];
+			uchar intensity2 = int_profile[j];
 			if(  intensity1==0 && intensity2 == 1){
 				start_ring = true;
 				start = j;
-				Point pt = line_pts[i][j];
-				circle(input, pt,3,Scalar(255,0,0));
+				/*Point pt = line_pts[i][j];
+				uchar intensity_test = profile.at<uchar>(j);
+				circle(input, pt,3,Scalar(255,0,0));*/
 			}
 			if (start_ring && intensity2 == 0){
 				width = j - start;
@@ -285,8 +296,8 @@ bool detectCode(const Mat &pts, int left, int top, int right, int bottom, Mat &i
 		}
 	}
 
-	imshow("lines", input);
-	waitKey();
+	/*imshow("lines", input);
+	waitKey();*/
 
 	int size1 = ring_starts[0].size();
 	int size2 = ring_starts[1].size();
