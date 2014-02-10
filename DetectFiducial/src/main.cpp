@@ -14,6 +14,8 @@
 #include <ap.h>
 #include <iostream>
 
+#define TRAIN_MODE
+
 using namespace cv;
 using namespace std;
 using namespace alglib;
@@ -21,7 +23,7 @@ using namespace alglib;
 void findConnectedComponents(const Mat &, Mat & );
 void doCluster(const Mat&, Mat&);
 void getPoints(const Mat &binOutput, int left, int top, int right, int bottom, Mat &outPts);
-bool detectCode(const Mat &pts, int left, int top, int right, int bottom, Mat &input, vector<float>& intensity_profile );
+bool detectCode(const Mat &pts, int left, int top, int right, int bottom, const Mat &input, vector<float>& intensity_profile );
 
 void processEntry(int index, int numObs, int clusterIndex, integer_2d_array Z, int * clusterid, int *done)
 {
@@ -53,6 +55,7 @@ int main(int argc, char* argv[])
 	Mat gaborOutput(input.size(), CV_8UC1);
 	gbFilter.filter(input, gaborOutput);
 
+#ifndef TRAIN_MODE
 	//Find Connected components in Gabor output
 	Mat connectedComponents, clusters;
 	findConnectedComponents(gaborOutput, connectedComponents);
@@ -70,8 +73,8 @@ int main(int argc, char* argv[])
 		Point pt1(x1,y1), pt2(x2,y2);
 		rectangle(input, pt1, pt2, Scalar(0,255,0) );
 	}
-//	imshow("box",input);
-//	waitKey();
+	imshow("box",input);
+	waitKey();
 
 	//Detect code in the bounding box
 	vector<float> intensity_profile;
@@ -103,14 +106,31 @@ int main(int argc, char* argv[])
 		cout<<"Code detected\n";
 		//Classify the detected code
 	}
+#else
+	int x1 = 0;
+	int y1 = 0;
+	int x2 = input.cols;
+	int y2 = input.rows;
+	Mat pts;
+	vector<float> intensity_profile;
+	getPoints(gaborOutput, x1, y1, x2, y2, pts);
+	bool found = detectCode(pts, x1, y1, x2, y2, input, intensity_profile);
+	if(found){
+		Mat output(100,1, DataType<float>::type);
+		Mat profile_mat(intensity_profile);
+		resize(profile_mat, output, output.size());
+		FileStorage file("training.xml", FileStorage::APPEND);
+		file<<"Vector"<<output;
+	}
+#endif
 }
 
-bool detectCode(const Mat &pts, int left, int top, int right, int bottom, Mat &input, vector<float>& intensity_profile ){
+bool detectCode(const Mat &pts, int left, int top, int right, int bottom, const Mat &input, vector<float>& intensity_profile ){
 	int numPts = pts.rows;
 	int dim = pts.cols;
 	PCA pca(pts, Mat(), CV_PCA_DATA_AS_ROW, 2);
-	float * ptr = pca.eigenvectors.ptr<float>(0);
-	double slope = ptr[1]/ptr[0];
+	float * eigen_vect = pca.eigenvectors.ptr<float>(0);
+	double slope = eigen_vect[1]/eigen_vect[0];
 	int centroid[2] = {0,0};
 	for(int i=0; i<numPts; i++){
 		centroid[0] += pts.at<float>(i,0);
@@ -263,7 +283,7 @@ bool detectCode(const Mat &pts, int left, int top, int right, int bottom, Mat &i
 		}
 	}
 
-
+	Mat cloned_input = input.clone();
 	vector<int> ring_starts[3];
 	vector<int> ring_widths[3];
 	for(int i=0; i<3; i++){
@@ -283,9 +303,9 @@ bool detectCode(const Mat &pts, int left, int top, int right, int bottom, Mat &i
 			if(  intensity1==0 && intensity2 == 1){
 				start_ring = true;
 				start = j;
-				/*Point pt = line_pts[i][j];
+				Point pt = line_pts[i][j];
 				uchar intensity_test = profile.at<uchar>(j);
-				circle(input, pt,3,Scalar(255,0,0));*/
+				circle(cloned_input, pt,3,Scalar(255,0,0));
 			}
 			if (start_ring && intensity2 == 0){
 				width = j - start;
@@ -296,16 +316,66 @@ bool detectCode(const Mat &pts, int left, int top, int right, int bottom, Mat &i
 		}
 	}
 
-	/*imshow("lines", input);
-	waitKey();*/
-
 	int size1 = ring_starts[0].size();
 	int size2 = ring_starts[1].size();
 	int size3 = ring_starts[2].size();
 
 	if(size1 == size2 && size2 == size3){
 		if(size1 >= 4 )
+		{
+			int* max_width = new int[size1];
+			int *max_index = new int[size1];
+			for(int i=0; i<size1; i++){
+				int maxwidth = ring_widths[0][i];
+				int maxindex = 0;
+				for(int j=1; j<3; j++){
+					if(ring_widths[j][i] > maxwidth){
+						maxindex = j;
+						maxwidth = ring_widths[j][i];
+					}
+				}
+				max_width[i] = maxwidth;
+				max_index[i] = maxindex;
+			}
+			int first_ring = max_index[0];
+			int firstRingStartIndex = ring_starts[first_ring][0];
+			Point firstRingStartPoint = line_pts[first_ring][firstRingStartIndex];
+
+			int last_ring = max_index[size1-1];
+			int lastRingStartIndex = ring_starts[last_ring][size1-1];
+			int lastRingWidth = max_width[size1-1];
+			Point lastRingStartPoint = line_pts[last_ring][lastRingStartIndex];
+			int xx = lastRingStartPoint.x;
+			int yy = lastRingStartPoint.y;
+			Point lastRingEndPoint;
+			if(slope>0){
+				lastRingEndPoint.x = xx + lastRingWidth*abs(eigen_vect[0]);
+				lastRingEndPoint.y = yy + lastRingWidth*abs(eigen_vect[1]);
+			}
+			else{
+				lastRingEndPoint.x = xx - lastRingWidth*abs(eigen_vect[0]);
+				lastRingEndPoint.y = yy + lastRingWidth*abs(eigen_vect[1]);;
+			}
+			circle(cloned_input, firstRingStartPoint, 3, Scalar(0,0,255) );
+			circle(cloned_input, lastRingEndPoint, 3, Scalar(0,0,255) );
+			Point2f diff_vector = lastRingEndPoint -  firstRingStartPoint;
+			int len = sqrt(diff_vector.dot(diff_vector));
+			diff_vector *= 1.0/len;
+			for (int i=0; i<len; i++){
+				Point2f diff_vectorWeighted =  i*diff_vector;
+				Point sample = firstRingStartPoint + Point(diff_vectorWeighted.x, diff_vectorWeighted.y);
+				uchar intensity = grayInput.at<uchar>(sample);
+				if(intensity > 127){
+					intensity_profile.push_back(1);
+				}
+				else{
+					intensity_profile.push_back(0);
+				}
+			}
+			imshow("lines", cloned_input);
+			waitKey();
 			return true;
+		}
 	}
 
 	return false;
