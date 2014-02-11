@@ -41,7 +41,8 @@
 // 2011 Jason Newton <nevion@gmail.com>
 //
 //
-#include <opencv/cv.h>>
+#include <opencv/cv.h>
+#include <opencv2/core/core.hpp>
 #include <vector>
 #include "ConnectedComponents.h"
 
@@ -63,6 +64,53 @@ struct Point2ui64{
 	Point2ui64(uint64 _x, uint64 _y):x(_x), y(_y){}
 };
 
+struct CCStatsOp{
+        cv::Mat *statsv;
+        cv::Mat *centroidsv;
+        std::vector<Point2ui64> integrals;
+
+        CCStatsOp(cv::Mat *_statsv, cv::Mat *_centroidsv): statsv(_statsv), centroidsv(_centroidsv){
+        }
+        inline
+        void init(int nlabels){
+            (*statsv).create(nlabels, CC_STAT_MAX, cv::DataType<int>::type);
+            (*centroidsv).create(nlabels, 2, cv::DataType<double>::type);
+
+            for(int l = 0; l < (int) nlabels; ++l){
+                int *row = (int *) &(*statsv).at<int>(l, 0);
+                row[CC_STAT_LEFT] = INT_MAX;
+                row[CC_STAT_TOP] = INT_MAX;
+                row[CC_STAT_WIDTH] = INT_MIN;
+                row[CC_STAT_HEIGHT] = INT_MIN;
+                row[CC_STAT_AREA] = 0;
+            }
+            integrals.resize(nlabels, Point2ui64(0, 0));
+        }
+        void operator()(int r, int c, int l){
+            int *row = &(*statsv).at<int>(l, 0);
+            row[CC_STAT_LEFT] = MIN(row[CC_STAT_LEFT], c);
+            row[CC_STAT_WIDTH] = MAX(row[CC_STAT_WIDTH], c);
+            row[CC_STAT_TOP] = MIN(row[CC_STAT_TOP], r);
+            row[CC_STAT_HEIGHT] = MAX(row[CC_STAT_HEIGHT], r);
+            row[CC_STAT_AREA]++;
+            Point2ui64 &integral = integrals[l];
+            integral.x += c;
+            integral.y += r;
+        }
+        void finish(){
+            for(int l = 0; l < (*statsv).rows; ++l){
+                int *row = &(*statsv).at<int>(l, 0);
+                row[CC_STAT_WIDTH] = row[CC_STAT_WIDTH] - row[CC_STAT_LEFT] + 1;
+                row[CC_STAT_HEIGHT] = row[CC_STAT_HEIGHT] - row[CC_STAT_TOP] + 1;
+
+                Point2ui64 &integral = integrals[l];
+                double *centroid = &(*centroidsv).at<double>(l, 0);
+                double area = ((unsigned*)row)[CC_STAT_AREA];
+                centroid[0] = double(integral.x) / area;
+                centroid[1] = double(integral.y) / area;
+            }
+        }
+    };
 
 //Find the root of the tree of node i
 template<typename LabelT>
@@ -146,7 +194,7 @@ struct LabelingImpl{
 		//A quick and dirty upper bound for the maximimum number of labels.  The 4 comes from
 		//the fact that a 3x3 block can never have more than 4 unique labels for both 4 & 8-way
 		const size_t Plength = 4 * (size_t(rows + 3 - 1)/3) * (size_t(cols + 3 - 1)/3);
-		LabelT *P = (LabelT *) malloc(sizeof(LabelT) * Plength);
+		LabelT *P = (LabelT *) cv::fastMalloc(sizeof(LabelT) * Plength);
 		P[0] = 0;
 		LabelT lunique = 1;
 		//scanning phase
@@ -274,7 +322,7 @@ struct LabelingImpl{
 		}
 
 		sop.finish();
-		free(P);
+		cv::fastFree(P);
 
 		return nLabels;
 	}//End function LabelingImpl operator()
@@ -320,55 +368,6 @@ extern int connectedComponents(cv::Mat &img, cv::Mat &labels, int connectivity, 
 		return 0;
 	}
 }
-
-struct CCStatsOp{
-        cv::Mat *statsv;
-        cv::Mat *centroidsv;
-        std::vector<Point2ui64> integrals;
-
-        CCStatsOp(cv::Mat *_statsv, cv::Mat *_centroidsv): statsv(_statsv), centroidsv(_centroidsv){
-        }
-        inline
-        void init(int nlabels){
-            (*statsv).create(cv::Size(CC_STAT_MAX, nlabels), cv::DataType<int>::type);
-            (*centroidsv).create(cv::Size(2, nlabels), cv::DataType<double>::type);
-
-            for(int l = 0; l < (int) nlabels; ++l){
-                int *row = (int *) &(*statsv).at<int>(l, 0);
-                row[CC_STAT_LEFT] = INT_MAX;
-                row[CC_STAT_TOP] = INT_MAX;
-                row[CC_STAT_WIDTH] = INT_MIN;
-                row[CC_STAT_HEIGHT] = INT_MIN;
-                row[CC_STAT_AREA] = 0;
-            }
-            integrals.resize(nlabels, Point2ui64(0, 0));
-        }
-        void operator()(int r, int c, int l){
-            int *row = &(*statsv).at<int>(l, 0);
-            row[CC_STAT_LEFT] = MIN(row[CC_STAT_LEFT], c);
-            row[CC_STAT_WIDTH] = MAX(row[CC_STAT_WIDTH], c);
-            row[CC_STAT_TOP] = MIN(row[CC_STAT_TOP], r);
-            row[CC_STAT_HEIGHT] = MAX(row[CC_STAT_HEIGHT], r);
-            row[CC_STAT_AREA]++;
-            Point2ui64 &integral = integrals[l];
-            integral.x += c;
-            integral.y += r;
-        }
-        void finish(){
-            for(int l = 0; l < (*statsv).rows; ++l){
-                int *row = &(*statsv).at<int>(l, 0);
-                row[CC_STAT_WIDTH] = row[CC_STAT_WIDTH] - row[CC_STAT_LEFT] + 1;
-                row[CC_STAT_HEIGHT] = row[CC_STAT_HEIGHT] - row[CC_STAT_TOP] + 1;
-
-                Point2ui64 &integral = integrals[l];
-                double *centroid = &(*centroidsv).at<double>(l, 0);
-                double area = ((unsigned*)row)[CC_STAT_AREA];
-                centroid[0] = double(integral.x) / area;
-                centroid[1] = double(integral.y) / area;
-            }
-        }
-    };
-
 
 extern int connectedComponentsWithStats(const cv::Mat &img, cv::Mat &labels, cv::Mat &statsv,
 		cv::Mat &centroids, int connectivity, int ltype)

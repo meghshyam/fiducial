@@ -10,11 +10,14 @@
 #include <opencv/cv.h>
 #include "GaborFilter.h"
 #include "ConnectedComponents.h"
+#include <opencv/ml.h>
 #include <dataanalysis.h>
 #include <ap.h>
 #include <iostream>
 
-#define TRAIN_MODE
+//#define TRAIN_MODE
+//#define DEBUG
+//#define DEBUG2
 
 using namespace cv;
 using namespace std;
@@ -24,6 +27,7 @@ void findConnectedComponents(const Mat &, Mat & );
 void doCluster(const Mat&, Mat&);
 void getPoints(const Mat &binOutput, int left, int top, int right, int bottom, Mat &outPts);
 bool detectCode(const Mat &pts, int left, int top, int right, int bottom, const Mat &input, vector<float>& intensity_profile );
+void createTrainingData(const string &orig_dirname, Mat & trainingData, Mat & response);
 
 void processEntry(int index, int numObs, int clusterIndex, integer_2d_array Z, int * clusterid, int *done)
 {
@@ -49,7 +53,8 @@ int main(int argc, char* argv[])
 	//Read image
 	Mat input;
 	input = imread(argv[1], 1);
-
+	int width = input.cols;
+	int height = input.rows;
 	//Apply Gabor Filter on input image
 	GaborFilter gbFilter;
 	Mat gaborOutput(input.size(), CV_8UC1);
@@ -63,6 +68,7 @@ int main(int argc, char* argv[])
 	//Cluster the connected components
 	doCluster(connectedComponents, clusters);
 	int numClusters = clusters.rows;
+	Mat cloned_input = input.clone();
 	for(int i=0; i<numClusters; i++)
 	{
 		float * row = (float *)&clusters.at<float>(i,0);
@@ -71,10 +77,12 @@ int main(int argc, char* argv[])
 		int x2 = row[2];
 		int y2 = row[3];
 		Point pt1(x1,y1), pt2(x2,y2);
-		rectangle(input, pt1, pt2, Scalar(0,255,0) );
+		rectangle(cloned_input, pt1, pt2, Scalar(0,255,0) );
 	}
-	imshow("box",input);
+#ifdef DEBUG
+	imshow("box",cloned_input);
 	waitKey();
+#endif
 
 	//Detect code in the bounding box
 	vector<float> intensity_profile;
@@ -88,14 +96,20 @@ int main(int argc, char* argv[])
 		int y2 = row[3];
 		Mat pts;
 		Point pt1(x1,y1), pt2(x2,y2);
-/*
 
-		  rectangle(gaborOutput, pt1, pt2, Scalar(255,0,0) );
-		  imshow("gabor", gaborOutput);
-		  waitKey();
-
-*/
+#ifdef DEBUG2
+	  rectangle(gaborOutput, pt1, pt2, Scalar(255,0,0) );
+	  imshow("gabor", gaborOutput);
+	  waitKey();
+#endif
 		getPoints(gaborOutput, x1, y1, x2, y2, pts);
+		/*
+		x1 = x1 - 5; y1=y1-5; x2 = x2+5; y2 = y2+5;
+		x1 = x1 < 0 ? 0 : x1;
+		y1 = y1 < 0 ? 0 : y1;
+		x2 = x2 > width ? width : x2;
+		y2 = y2 > height ? height : y2;
+		*/
 		found = detectCode(pts, x1, y1, x2, y2, input, intensity_profile);
 		if(found)
 			break;
@@ -103,8 +117,28 @@ int main(int argc, char* argv[])
 	if(!found){
 		cout<<"Code not detected\n";
 	}else{
-		cout<<"Code detected\n";
+		//cout<<"Code detected\n";
 		//Classify the detected code
+		Mat sample(1, 100, DataType<float>::type);
+		Mat profile_mat(intensity_profile);
+		transpose(profile_mat, profile_mat);
+		resize(profile_mat, sample, sample.size());
+
+		Mat trainingData,response;
+		string dirname = "/home/meghshyam/git/fiducial/DetectFiducial/trainingData/";
+		createTrainingData(dirname, trainingData, response);
+
+		/*
+					FileStorage file("training.xml", FileStorage::WRITE);
+					file<<"Sample"<<trainingData;
+					file<<"class"<<response;
+		 */
+
+		const int K =5;
+		CvKNearest knn(trainingData, response, Mat(), false, K);
+		Mat results(sample.rows, 1, DataType<float>::type);
+		knn.find_nearest(sample, K, &results);
+		cout<<"Class:"<<results.at<float>(0)<<"\n";
 	}
 #else
 	int x1 = 0;
@@ -116,11 +150,26 @@ int main(int argc, char* argv[])
 	getPoints(gaborOutput, x1, y1, x2, y2, pts);
 	bool found = detectCode(pts, x1, y1, x2, y2, input, intensity_profile);
 	if(found){
-		Mat output(100,1, DataType<float>::type);
+		Mat sample(1, 100, DataType<float>::type);
 		Mat profile_mat(intensity_profile);
-		resize(profile_mat, output, output.size());
-		FileStorage file("training.xml", FileStorage::APPEND);
-		file<<"Vector"<<output;
+		transpose(profile_mat, profile_mat);
+		resize(profile_mat, sample, sample.size());
+
+		Mat trainingData,response;
+		string dirname = "/home/meghshyam/git/fiducial/DetectFiducial/trainingData/";
+		createTrainingData(dirname, trainingData, response);
+
+		/*
+			FileStorage file("training.xml", FileStorage::WRITE);
+			file<<"Sample"<<trainingData;
+			file<<"class"<<response;
+		 */
+
+		const int K =5;
+		CvKNearest knn(trainingData, response, Mat(), false, K);
+		Mat results(sample.rows, 1, DataType<float>::type);
+		knn.find_nearest(sample, K, &results);
+		cout<<"Class:"<<results.at<float>(0)<<"\n";
 	}
 #endif
 }
@@ -372,8 +421,10 @@ bool detectCode(const Mat &pts, int left, int top, int right, int bottom, const 
 					intensity_profile.push_back(0);
 				}
 			}
+#ifdef DEBUG
 			imshow("lines", cloned_input);
 			waitKey();
+#endif
 			return true;
 		}
 	}
@@ -403,6 +454,9 @@ void findConnectedComponents(const Mat &binaryImage, Mat &out){
 	Mat stats, centroids;
 	Mat components(binaryImage.size(), CV_8UC1);
 	//connectedComponents(binaryImage, components, 4, CV_16U);
+	Mat clone_image = binaryImage.clone();
+	//imshow("connected comps", clone_image);
+	//waitKey();
 	int numLabels = connectedComponentsWithStats(binaryImage, components, stats, centroids, 4, CV_16U);
 	out.create(numLabels-1, 4, DataType<float>::type);
 	int k=0;
@@ -412,7 +466,6 @@ void findConnectedComponents(const Mat &binaryImage, Mat &out){
 		int area = stats.at<int>(i, CC_STAT_AREA);
 		if(area > 25)
 		{
-			vector<Point> pts;
 			int x1 = stats.at<int>(i, CC_STAT_LEFT);
 			int y1 = stats.at<int>(i, CC_STAT_TOP);
 			int x2 = x1 + stats.at<int>(i, CC_STAT_WIDTH);
@@ -420,11 +473,22 @@ void findConnectedComponents(const Mat &binaryImage, Mat &out){
 			float * row = (float*)&out.at<float>(k,0);
 			k++;
 			row[0] = (float)x1; row[1] = (float)y1; row[2] = (float)x2; row[3] = (float)y2;
-			/*Point pt1(x1,y1), pt2(x2,y2);
-			rectangle(binaryImage, pt1, pt2, Scalar(255,0,0) );*/
+			Point pt1(x1,y1), pt2(x2,y2);
+			/*
+			rectangle(clone_image, pt1, pt2, Scalar(255,0,0) );
+			imshow("connected comps", clone_image);
+			waitKey();
+			*/
 		}
 	}
-	out = out.rowRange(cv::Range(0,k-1));
+
+
+	if(k<numLabels-1){
+		out = out.rowRange(cv::Range(0,k));
+	}
+	components.release();
+	centroids.release();
+	stats.release();
 }
 
 void doCluster(const Mat &connectedComponents, Mat& clusters)
@@ -456,7 +520,7 @@ void doCluster(const Mat &connectedComponents, Mat& clusters)
 	ahcreport rep;
 
 	clusterizercreate(s);
-	clusterizersetahcalgo(s,1);
+	clusterizersetahcalgo(s,2);
 	clusterizersetpoints(s, input, 2);
 	clusterizerrunahc(s, rep);
 	integer_2d_array Z(rep.z);
@@ -465,7 +529,7 @@ void doCluster(const Mat &connectedComponents, Mat& clusters)
 
 	int current_cluster_id = 0;
 	//float criteria = atof(argv[1]);
-	float criteria = 100;
+	float criteria = 150;
 	int *done = new int[numRows];
 	for(int i=0; i<numRows; i++)
 	{
@@ -539,4 +603,49 @@ void doCluster(const Mat &connectedComponents, Mat& clusters)
 	}
 	delete(firstMember);
 	delete(clusterid);
+}
+
+void createTrainingData(const string &orig_dirname, Mat & trainingData, Mat & response)
+{
+	string dirname = orig_dirname;
+	string filename = dirname.append("trainingdata00.yaml");
+	FileStorage file1(filename, FileStorage::READ);
+	Mat trainingData00;
+	file1["training_data_00"] >> trainingData00;
+	file1.release();
+
+	dirname = orig_dirname;
+	filename = dirname.append("trainingdata01.yaml");
+	FileStorage file2(filename, FileStorage::READ);
+	Mat trainingData01;
+	file2["training_data_01"] >> trainingData01;
+	file2.release();
+
+	dirname = orig_dirname;
+	filename = dirname.append("trainingdata10.yaml");
+	FileStorage file3(filename, FileStorage::READ);
+	Mat trainingData10;
+	file3["training_data_10"] >> trainingData10;
+	file3.release();
+
+	dirname = orig_dirname;
+	filename = dirname.append("trainingdata11.yaml");
+	FileStorage file4(filename, FileStorage::READ);
+	Mat trainingData11;
+	file4["training_data_11"] >> trainingData11;
+	file4.release();
+
+	vconcat(trainingData00, trainingData01, trainingData);
+	vconcat(trainingData, trainingData10, trainingData);
+	vconcat(trainingData, trainingData11, trainingData);
+
+	Mat response1(trainingData00.rows, 1, DataType<float>::type);
+	Mat response2(trainingData01.rows, 1, DataType<float>::type);
+	Mat response3(trainingData10.rows, 1, DataType<float>::type);
+	Mat response4(trainingData11.rows, 1, DataType<float>::type);
+	response1 = Scalar(0); response2 =Scalar(1); response3 =Scalar(2); response4 =Scalar(3);
+
+	vconcat(response1, response2, response);
+	vconcat(response, response3, response);
+	vconcat(response, response4, response);
 }
