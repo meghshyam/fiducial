@@ -12,6 +12,7 @@
 
 int connectedComponents(cv::Mat &img, cv::Mat &labels, int connectivity, int ltype);
 int connectedComponentsWithStats(const cv::Mat &img, cv::Mat &labels, cv::Mat &statsv, cv::Mat &centroids, int connectivity, int ltype);
+int connectedComponentsWithStats(const cv::Mat &img, cv::Mat &statsv);
 //! connected components algorithm output formats
 
 enum { CC_STAT_LEFT   = 0,

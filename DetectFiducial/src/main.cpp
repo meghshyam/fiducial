@@ -158,13 +158,11 @@ int main(int argc, char* argv[])
 		Mat trainingData,response;
 		string dirname = "/home/meghshyam/git/fiducial/DetectFiducial/trainingData/";
 		createTrainingData(dirname, trainingData, response);
-
 		/*
 			FileStorage file("training.xml", FileStorage::WRITE);
 			file<<"Sample"<<trainingData;
 			file<<"class"<<response;
-		 */
-
+		*/
 		const int K =5;
 		CvKNearest knn(trainingData, response, Mat(), false, K);
 		Mat results(sample.rows, 1, DataType<float>::type);
@@ -172,6 +170,7 @@ int main(int argc, char* argv[])
 		cout<<"Class:"<<results.at<float>(0)<<"\n";
 	}
 #endif
+
 }
 
 bool detectCode(const Mat &pts, int left, int top, int right, int bottom, const Mat &input, vector<float>& intensity_profile ){
@@ -451,14 +450,9 @@ void getPoints(const Mat &binOutput, int left, int top, int right, int bottom, M
 }
 
 void findConnectedComponents(const Mat &binaryImage, Mat &out){
-	Mat stats, centroids;
-	Mat components(binaryImage.size(), CV_8UC1);
-	//connectedComponents(binaryImage, components, 4, CV_16U);
-	Mat clone_image = binaryImage.clone();
-	//imshow("connected comps", clone_image);
-	//waitKey();
-	int numLabels = connectedComponentsWithStats(binaryImage, components, stats, centroids, 4, CV_16U);
-	out.create(numLabels-1, 4, DataType<float>::type);
+	Mat stats;
+	int numLabels = connectedComponentsWithStats(binaryImage, stats);
+	out.create(numLabels, 4, DataType<float>::type);
 	int k=0;
 	for(int i=1; i<numLabels; i++)
 	{
@@ -482,12 +476,9 @@ void findConnectedComponents(const Mat &binaryImage, Mat &out){
 		}
 	}
 
-
-	if(k<numLabels-1){
+	if(k<numLabels){
 		out = out.rowRange(cv::Range(0,k));
 	}
-	components.release();
-	centroids.release();
 	stats.release();
 }
 
@@ -520,7 +511,7 @@ void doCluster(const Mat &connectedComponents, Mat& clusters)
 	ahcreport rep;
 
 	clusterizercreate(s);
-	clusterizersetahcalgo(s,2);
+	clusterizersetahcalgo(s,1);
 	clusterizersetpoints(s, input, 2);
 	clusterizerrunahc(s, rep);
 	integer_2d_array Z(rep.z);
@@ -529,7 +520,7 @@ void doCluster(const Mat &connectedComponents, Mat& clusters)
 
 	int current_cluster_id = 0;
 	//float criteria = atof(argv[1]);
-	float criteria = 150;
+	float criteria = 85;
 	int *done = new int[numRows];
 	for(int i=0; i<numRows; i++)
 	{
