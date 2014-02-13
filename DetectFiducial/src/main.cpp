@@ -18,6 +18,7 @@
 //#define TRAIN_MODE
 //#define DEBUG
 //#define DEBUG2
+//#define DEBUG3
 
 using namespace cv;
 using namespace std;
@@ -59,6 +60,7 @@ int main(int argc, char* argv[])
 	GaborFilter gbFilter;
 	Mat gaborOutput(input.size(), CV_8UC1);
 	gbFilter.filter(input, gaborOutput);
+	Mat clonedgaborOutput = gaborOutput.clone();
 
 #ifndef TRAIN_MODE
 	//Find Connected components in Gabor output
@@ -96,10 +98,9 @@ int main(int argc, char* argv[])
 		int y2 = row[3];
 		Mat pts;
 		Point pt1(x1,y1), pt2(x2,y2);
-
 #ifdef DEBUG2
-	  rectangle(gaborOutput, pt1, pt2, Scalar(255,0,0) );
-	  imshow("gabor", gaborOutput);
+	  rectangle(clonedgaborOutput, pt1, pt2, Scalar(255,0,0) );
+	  imshow("gabor", clonedgaborOutput);
 	  waitKey();
 #endif
 		getPoints(gaborOutput, x1, y1, x2, y2, pts);
@@ -129,10 +130,11 @@ int main(int argc, char* argv[])
 		createTrainingData(dirname, trainingData, response);
 
 		/*
-					FileStorage file("training.xml", FileStorage::WRITE);
-					file<<"Sample"<<trainingData;
-					file<<"class"<<response;
-		 */
+		FileStorage file("test2.xml", FileStorage::WRITE);
+		file<<"Orig_sample"<<profile_mat;
+		file<<"Sample"<<sample;
+		file.release();
+		*/
 
 		const int K =5;
 		CvKNearest knn(trainingData, response, Mat(), false, K);
@@ -368,9 +370,10 @@ bool detectCode(const Mat &pts, int left, int top, int right, int bottom, const 
 	int size2 = ring_starts[1].size();
 	int size3 = ring_starts[2].size();
 
-	if(size1 == size2 && size2 == size3){
-		if(size1 >= 4 )
-		{
+	//if(size1 == size2 && size2 == size3){
+	if(size1 >= 4 && size2 >= 4 && size3 >= 4)
+	{
+		/*
 			int* max_width = new int[size1];
 			int *max_index = new int[size1];
 			for(int i=0; i<size1; i++){
@@ -385,48 +388,51 @@ bool detectCode(const Mat &pts, int left, int top, int right, int bottom, const 
 				max_width[i] = maxwidth;
 				max_index[i] = maxindex;
 			}
-			int first_ring = max_index[0];
-			int firstRingStartIndex = ring_starts[first_ring][0];
-			Point firstRingStartPoint = line_pts[first_ring][firstRingStartIndex];
+		 */
+		//int first_ring = max_index[0];
+		int first_ring = 1;
+		int firstRingStartIndex = ring_starts[first_ring][0];
+		Point firstRingStartPoint = line_pts[first_ring][firstRingStartIndex];
 
-			int last_ring = max_index[size1-1];
-			int lastRingStartIndex = ring_starts[last_ring][size1-1];
-			int lastRingWidth = max_width[size1-1];
-			Point lastRingStartPoint = line_pts[last_ring][lastRingStartIndex];
-			int xx = lastRingStartPoint.x;
-			int yy = lastRingStartPoint.y;
-			Point lastRingEndPoint;
-			if(slope>0){
-				lastRingEndPoint.x = xx + lastRingWidth*abs(eigen_vect[0]);
-				lastRingEndPoint.y = yy + lastRingWidth*abs(eigen_vect[1]);
+		//int last_ring = max_index[size1-1];
+		int last_ring = 1;
+		int lastRingStartIndex = ring_starts[last_ring][size2-1];
+		int lastRingWidth = ring_widths[last_ring][size2-1];
+		Point lastRingStartPoint = line_pts[last_ring][lastRingStartIndex];
+		int xx = lastRingStartPoint.x;
+		int yy = lastRingStartPoint.y;
+		Point lastRingEndPoint;
+		if(slope>0){
+			lastRingEndPoint.x = xx + lastRingWidth*abs(eigen_vect[0]);
+			lastRingEndPoint.y = yy + lastRingWidth*abs(eigen_vect[1]);
+		}
+		else{
+			lastRingEndPoint.x = xx - lastRingWidth*abs(eigen_vect[0]);
+			lastRingEndPoint.y = yy + lastRingWidth*abs(eigen_vect[1]);;
+		}
+		circle(cloned_input, firstRingStartPoint, 3, Scalar(0,0,255) );
+		circle(cloned_input, lastRingEndPoint, 3, Scalar(0,0,255) );
+		Point2f diff_vector = lastRingEndPoint -  firstRingStartPoint;
+		int len = sqrt(diff_vector.dot(diff_vector));
+		diff_vector *= 1.0/len;
+		for (int i=0; i<len; i++){
+			Point2f diff_vectorWeighted =  i*diff_vector;
+			Point sample = firstRingStartPoint + Point(diff_vectorWeighted.x, diff_vectorWeighted.y);
+			uchar intensity = grayInput.at<uchar>(sample);
+			if(intensity > 127){
+				intensity_profile.push_back(1);
 			}
 			else{
-				lastRingEndPoint.x = xx - lastRingWidth*abs(eigen_vect[0]);
-				lastRingEndPoint.y = yy + lastRingWidth*abs(eigen_vect[1]);;
+				intensity_profile.push_back(0);
 			}
-			circle(cloned_input, firstRingStartPoint, 3, Scalar(0,0,255) );
-			circle(cloned_input, lastRingEndPoint, 3, Scalar(0,0,255) );
-			Point2f diff_vector = lastRingEndPoint -  firstRingStartPoint;
-			int len = sqrt(diff_vector.dot(diff_vector));
-			diff_vector *= 1.0/len;
-			for (int i=0; i<len; i++){
-				Point2f diff_vectorWeighted =  i*diff_vector;
-				Point sample = firstRingStartPoint + Point(diff_vectorWeighted.x, diff_vectorWeighted.y);
-				uchar intensity = grayInput.at<uchar>(sample);
-				if(intensity > 127){
-					intensity_profile.push_back(1);
-				}
-				else{
-					intensity_profile.push_back(0);
-				}
-			}
-#ifdef DEBUG
-			imshow("lines", cloned_input);
-			waitKey();
-#endif
-			return true;
 		}
+#ifdef DEBUG
+		imshow("lines", cloned_input);
+		waitKey();
+#endif
+		return true;
 	}
+	//}
 
 	return false;
 }
@@ -450,11 +456,12 @@ void getPoints(const Mat &binOutput, int left, int top, int right, int bottom, M
 }
 
 void findConnectedComponents(const Mat &binaryImage, Mat &out){
+	//Mat clone_image = binaryImage.clone();
 	Mat stats;
 	int numLabels = connectedComponentsWithStats(binaryImage, stats);
 	out.create(numLabels, 4, DataType<float>::type);
 	int k=0;
-	for(int i=1; i<numLabels; i++)
+	for(int i=0; i<numLabels; i++)
 	{
 		//cout<<"area = "<<stats.at<int>(i, CC_STAT_AREA)<<"\n";
 		int area = stats.at<int>(i, CC_STAT_AREA);
@@ -485,6 +492,16 @@ void findConnectedComponents(const Mat &binaryImage, Mat &out){
 void doCluster(const Mat &connectedComponents, Mat& clusters)
 {
 	int numElements = connectedComponents.rows;
+	if(numElements == 1){
+		clusters.create(1,4,DataType<float>::type);
+		float * row = (float *)&connectedComponents.at<float>(0,0);
+		float *cluster= (float*) &clusters.at<float>(0,0);
+		cluster[0]= row[0];
+		cluster[1]= row[1];
+		cluster[2]= row[2];
+		cluster[3]= row[3];
+		return;
+	}
 
 	/*cvflann::KMeansIndexParams kmean_params(10, 30, cvflann::CENTERS_KMEANSPP);
 	Mat centers(numElements, 4, CV_32F);
@@ -511,7 +528,7 @@ void doCluster(const Mat &connectedComponents, Mat& clusters)
 	ahcreport rep;
 
 	clusterizercreate(s);
-	clusterizersetahcalgo(s,1);
+	clusterizersetahcalgo(s,2);
 	clusterizersetpoints(s, input, 2);
 	clusterizerrunahc(s, rep);
 	integer_2d_array Z(rep.z);
@@ -520,7 +537,7 @@ void doCluster(const Mat &connectedComponents, Mat& clusters)
 
 	int current_cluster_id = 0;
 	//float criteria = atof(argv[1]);
-	float criteria = 85;
+	float criteria = 150;
 	int *done = new int[numRows];
 	for(int i=0; i<numRows; i++)
 	{
