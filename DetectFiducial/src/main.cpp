@@ -60,7 +60,9 @@ int main(int argc, char* argv[])
 	GaborFilter gbFilter;
 	Mat gaborOutput(input.size(), CV_8UC1);
 	gbFilter.filter(input, gaborOutput);
+#ifdef DEBUG
 	Mat clonedgaborOutput = gaborOutput.clone();
+#endif
 
 #ifndef TRAIN_MODE
 	//Find Connected components in Gabor output
@@ -70,7 +72,9 @@ int main(int argc, char* argv[])
 	//Cluster the connected components
 	doCluster(connectedComponents, clusters);
 	int numClusters = clusters.rows;
+#ifdef DEBUG
 	Mat cloned_input = input.clone();
+#endif
 	for(int i=0; i<numClusters; i++)
 	{
 		float * row = (float *)&clusters.at<float>(i,0);
@@ -79,7 +83,9 @@ int main(int argc, char* argv[])
 		int x2 = row[2];
 		int y2 = row[3];
 		Point pt1(x1,y1), pt2(x2,y2);
+#ifdef DEBUG
 		rectangle(cloned_input, pt1, pt2, Scalar(0,255,0) );
+#endif
 	}
 #ifdef DEBUG
 	imshow("box",cloned_input);
@@ -124,6 +130,7 @@ int main(int argc, char* argv[])
 		Mat profile_mat(intensity_profile);
 		transpose(profile_mat, profile_mat);
 		resize(profile_mat, sample, sample.size());
+
 
 		Mat trainingData,response;
 		string dirname = "/home/meghshyam/git/fiducial/DetectFiducial/trainingData/";
@@ -332,8 +339,9 @@ bool detectCode(const Mat &pts, int left, int top, int right, int bottom, const 
 			intensities[index][i] = intensity_test;
 		}
 	}
-
+#ifdef DEBUG
 	Mat cloned_input = input.clone();
+#endif
 	vector<int> ring_starts[3];
 	vector<int> ring_widths[3];
 	for(int i=0; i<3; i++){
@@ -355,7 +363,9 @@ bool detectCode(const Mat &pts, int left, int top, int right, int bottom, const 
 				start = j;
 				Point pt = line_pts[i][j];
 				uchar intensity_test = profile.at<uchar>(j);
+#ifdef DEBUG
 				circle(cloned_input, pt,3,Scalar(255,0,0));
+#endif
 			}
 			if (start_ring && intensity2 == 0){
 				width = j - start;
@@ -410,8 +420,10 @@ bool detectCode(const Mat &pts, int left, int top, int right, int bottom, const 
 			lastRingEndPoint.x = xx - lastRingWidth*abs(eigen_vect[0]);
 			lastRingEndPoint.y = yy + lastRingWidth*abs(eigen_vect[1]);;
 		}
+#ifdef DEBUG
 		circle(cloned_input, firstRingStartPoint, 3, Scalar(0,0,255) );
 		circle(cloned_input, lastRingEndPoint, 3, Scalar(0,0,255) );
+#endif
 		Point2f diff_vector = lastRingEndPoint -  firstRingStartPoint;
 		int len = sqrt(diff_vector.dot(diff_vector));
 		diff_vector *= 1.0/len;
@@ -433,7 +445,10 @@ bool detectCode(const Mat &pts, int left, int top, int right, int bottom, const 
 		return true;
 	}
 	//}
-
+#ifdef DEBUG
+		imshow("lines", cloned_input);
+		waitKey();
+#endif
 	return false;
 }
 
