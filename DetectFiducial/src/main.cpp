@@ -15,6 +15,7 @@
 #include <ap.h>
 #include <iostream>
 
+
 //#define TRAIN_MODE
 //#define DEBUG
 //#define DEBUG2
@@ -29,6 +30,25 @@ void doCluster(const Mat&, Mat&);
 void getPoints(const Mat &binOutput, int left, int top, int right, int bottom, Mat &outPts);
 bool detectCode(const Mat &pts, int left, int top, int right, int bottom, const Mat &input, vector<float>& intensity_profile );
 void createTrainingData(const string &orig_dirname, Mat & trainingData, Mat & response);
+
+int findDiffMinMax(vector<int> ring_widths[], int dim, int first, int second){
+	vector<int> first_ring_width = ring_widths[first];
+	vector<int> second_ring_width = ring_widths[second];
+	int diff, min, max;
+	min = std::min(first_ring_width[0], second_ring_width[0]);
+	max = std::max(first_ring_width[0], second_ring_width[0]);
+	for(int i=1; i<dim; i++){
+		int newmin = std::min(first_ring_width[i], second_ring_width[i]);
+		int newmax = std::max(first_ring_width[i], second_ring_width[i]);
+		if(newmin < min)
+			min = newmin;
+		if(newmax > max){
+			max = newmax;
+		}
+	}
+	diff = max -min;
+	return diff;
+}
 
 float distL2(Point pt1, Point pt2){
 	float dist = (pt1.x - pt2.x)*(pt1.x - pt2.x) + (pt1.y - pt2.y)*(pt1.y - pt2.y);
@@ -429,7 +449,16 @@ bool detectCode(const Mat &pts, int left, int top, int right, int bottom, const 
 #endif
 				return false;
 			}
-
+			else{
+				int diff_min_max = findDiffMinMax(ring_widths, size2, 0, 1);
+				if(diff_min_max > 5){
+#ifdef DEBUG
+					imshow("lines", cloned_input);
+					waitKey();
+#endif
+					return false;
+				}
+			}
 		}
 		else if (size2 == size3){
 			int index = ring_starts[2][0];
@@ -439,16 +468,24 @@ bool detectCode(const Mat &pts, int left, int top, int right, int bottom, const 
 			Point end_pt3 = line_pts[2][index];
 
 			float distance = distL2(firstRingStartPoint, start_pt3) + distL2(lastRingStartPoint, end_pt3);
-			if(distance > 12){
+			if(distance > 15){
 #ifdef DEBUG
 				imshow("lines", cloned_input);
 				waitKey();
 #endif
 				return false;
 			}
+			else{
+				int diff_min_max = findDiffMinMax(ring_widths, size2, 1, 2);
+				if(diff_min_max > 5){
+#ifdef DEBUG
+					imshow("lines", cloned_input);
+					waitKey();
+#endif
+					return false;
+				}
+			}
 		}
-
-
 		int lastRingWidth = ring_widths[last_ring][size2-1];
 
 
