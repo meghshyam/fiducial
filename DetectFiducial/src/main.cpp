@@ -30,6 +30,11 @@ void getPoints(const Mat &binOutput, int left, int top, int right, int bottom, M
 bool detectCode(const Mat &pts, int left, int top, int right, int bottom, const Mat &input, vector<float>& intensity_profile );
 void createTrainingData(const string &orig_dirname, Mat & trainingData, Mat & response);
 
+float distL2(Point pt1, Point pt2){
+	float dist = (pt1.x - pt2.x)*(pt1.x - pt2.x) + (pt1.y - pt2.y)*(pt1.y - pt2.y);
+	return sqrt(dist);
+}
+
 void processEntry(int index, int numObs, int clusterIndex, integer_2d_array Z, int * clusterid, int *done)
 {
 	for(int j=0; j<2; j++){
@@ -381,7 +386,7 @@ bool detectCode(const Mat &pts, int left, int top, int right, int bottom, const 
 	int size3 = ring_starts[2].size();
 
 	//if(size1 == size2 && size2 == size3){
-	if(size1 >= 4 && size2 >= 4 && size3 >= 4)
+	if(size1 >= 4 && size2 >= 4 && size3 >= 4 && (size1 == size2 || size2 == size3))
 	{
 		/*
 			int* max_width = new int[size1];
@@ -407,8 +412,46 @@ bool detectCode(const Mat &pts, int left, int top, int right, int bottom, const 
 		//int last_ring = max_index[size1-1];
 		int last_ring = 1;
 		int lastRingStartIndex = ring_starts[last_ring][size2-1];
-		int lastRingWidth = ring_widths[last_ring][size2-1];
 		Point lastRingStartPoint = line_pts[last_ring][lastRingStartIndex];
+		if(size1 == size2)
+		{
+			int index = ring_starts[0][0];
+			Point start_pt1 = line_pts[0][index];
+
+			index = ring_starts[0][size1-1];
+			Point end_pt1 = line_pts[0][index];
+
+			float distance = distL2(firstRingStartPoint, start_pt1) + distL2(lastRingStartPoint, end_pt1);
+			if(distance > 15){
+#ifdef DEBUG
+				imshow("lines", cloned_input);
+				waitKey();
+#endif
+				return false;
+			}
+
+		}
+		else if (size2 == size3){
+			int index = ring_starts[2][0];
+			Point start_pt3 = line_pts[2][index];
+
+			index = ring_starts[2][size3-1];
+			Point end_pt3 = line_pts[2][index];
+
+			float distance = distL2(firstRingStartPoint, start_pt3) + distL2(lastRingStartPoint, end_pt3);
+			if(distance > 12){
+#ifdef DEBUG
+				imshow("lines", cloned_input);
+				waitKey();
+#endif
+				return false;
+			}
+		}
+
+
+		int lastRingWidth = ring_widths[last_ring][size2-1];
+
+
 		int xx = lastRingStartPoint.x;
 		int yy = lastRingStartPoint.y;
 		Point lastRingEndPoint;
