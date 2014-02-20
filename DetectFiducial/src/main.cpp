@@ -1,4 +1,4 @@
-/*
+ /*
  * main.cpp
  *
  *  Created on: Jan 24, 2014
@@ -28,7 +28,7 @@ using namespace alglib;
 void findConnectedComponents(const Mat &, Mat & );
 void doCluster(const Mat&, Mat&);
 void getPoints(const Mat &binOutput, int left, int top, int right, int bottom, Mat &outPts);
-bool detectCode(const Mat &pts, int left, int top, int right, int bottom, const Mat &input, vector<float>& intensity_profile );
+bool detectCode(const Mat &pts, int left, int top, int right, int bottom, const Mat &input, vector<float>& intensity_profile, int& num_rings );
 void createTrainingData(const string &orig_dirname, Mat & trainingData, Mat & response);
 
 int findDiffMinMax(vector<int> ring_widths[], int dim, int first, int second){
@@ -120,6 +120,11 @@ int main(int argc, char* argv[])
 	//Detect code in the bounding box
 	vector<float> intensity_profile;
 	bool found = false;
+	Mat trainingData,response;
+	string dirname = "/home/meghshyam/git/fiducial/DetectFiducial/trainingData/";
+	createTrainingData(dirname, trainingData, response);
+	const int K =11;
+	CvKNearest knn(trainingData, response, Mat(), false, K);
 	for(int i=0; i<numClusters; i++)
 	{
 		float * row = (float *)&clusters.at<float>(i,0);
@@ -142,37 +147,44 @@ int main(int argc, char* argv[])
 		x2 = x2 > width ? width : x2;
 		y2 = y2 > height ? height : y2;
 		*/
-		found = detectCode(pts, x1, y1, x2, y2, input, intensity_profile);
+		intensity_profile.clear();
+		int num_rings = -1;
+		found = detectCode(pts, x1, y1, x2, y2, input, intensity_profile, num_rings);
 		if(found)
+		{
+			if(num_rings ==1 ){
+			Mat sample(1, 100, DataType<float>::type);
+			Mat profile_mat(intensity_profile);
+			transpose(profile_mat, profile_mat);
+			resize(profile_mat, sample, sample.size());
+/*
+		FileStorage file("test2.xml", FileStorage::WRITE);
+		file<<"Orig_sample"<<profile_mat;
+		file<<"Sample"<<sample;
+		file.release();
+*/
+			Mat responses(K,1,DataType<float>::type);
+			const float ** neighbours;
+
+			Mat results(sample.rows, 1, DataType<float>::type);
+			Mat dist(K, 1, DataType<float>::type);
+			knn.find_nearest (sample, K, results, responses, dist);
+			cout<<"Class:"<<results.at<float>(0)<<"\n";
+			}
+			else{
+				if(num_rings == 0)
+					cout<<"Class:"<<0<<"\n";
+				else if(num_rings == 2)
+					cout<<"Class:"<<3<<"\n";
+			}
 			break;
+		}
 	}
 	if(!found){
 		cout<<"Code not detected\n";
 	}else{
 		//cout<<"Code detected\n";
 		//Classify the detected code
-		Mat sample(1, 100, DataType<float>::type);
-		Mat profile_mat(intensity_profile);
-		transpose(profile_mat, profile_mat);
-		resize(profile_mat, sample, sample.size());
-
-
-		Mat trainingData,response;
-		string dirname = "/home/meghshyam/git/fiducial/DetectFiducial/trainingData/";
-		createTrainingData(dirname, trainingData, response);
-
-		/*
-		FileStorage file("test2.xml", FileStorage::WRITE);
-		file<<"Orig_sample"<<profile_mat;
-		file<<"Sample"<<sample;
-		file.release();
-		*/
-
-		const int K =5;
-		CvKNearest knn(trainingData, response, Mat(), false, K);
-		Mat results(sample.rows, 1, DataType<float>::type);
-		knn.find_nearest(sample, K, &results);
-		cout<<"Class:"<<results.at<float>(0)<<"\n";
 	}
 #else
 	int x1 = 0;
@@ -207,7 +219,7 @@ int main(int argc, char* argv[])
 
 }
 
-bool detectCode(const Mat &pts, int left, int top, int right, int bottom, const Mat &input, vector<float>& intensity_profile ){
+bool detectCode(const Mat &pts, int left, int top, int right, int bottom, const Mat &input, vector<float>& intensity_profile, int &num_rings ){
 	int numPts = pts.rows;
 	int dim = pts.cols;
 	PCA pca(pts, Mat(), CV_PCA_DATA_AS_ROW, 2);
@@ -451,7 +463,7 @@ bool detectCode(const Mat &pts, int left, int top, int right, int bottom, const 
 			}
 			else{
 				int diff_min_max = findDiffMinMax(ring_widths, size2, 0, 1);
-				if(diff_min_max > 5){
+				if(diff_min_max > 7){
 #ifdef DEBUG
 					imshow("lines", cloned_input);
 					waitKey();
@@ -488,7 +500,6 @@ bool detectCode(const Mat &pts, int left, int top, int right, int bottom, const 
 		}
 		int lastRingWidth = ring_widths[last_ring][size2-1];
 
-
 		int xx = lastRingStartPoint.x;
 		int yy = lastRingStartPoint.y;
 		Point lastRingEndPoint;
@@ -518,6 +529,7 @@ bool detectCode(const Mat &pts, int left, int top, int right, int bottom, const 
 				intensity_profile.push_back(0);
 			}
 		}
+		num_rings = size2 /2 - 2;
 #ifdef DEBUG
 		imshow("lines", cloned_input);
 		waitKey();
@@ -710,15 +722,16 @@ void doCluster(const Mat &connectedComponents, Mat& clusters)
 
 void createTrainingData(const string &orig_dirname, Mat & trainingData, Mat & response)
 {
+	/*
 	string dirname = orig_dirname;
 	string filename = dirname.append("trainingdata00.yaml");
 	FileStorage file1(filename, FileStorage::READ);
 	Mat trainingData00;
 	file1["training_data_00"] >> trainingData00;
 	file1.release();
-
-	dirname = orig_dirname;
-	filename = dirname.append("trainingdata01.yaml");
+	*/
+	string dirname = orig_dirname;
+	string filename = dirname.append("trainingdata01.yaml");
 	FileStorage file2(filename, FileStorage::READ);
 	Mat trainingData01;
 	file2["training_data_01"] >> trainingData01;
@@ -730,25 +743,32 @@ void createTrainingData(const string &orig_dirname, Mat & trainingData, Mat & re
 	Mat trainingData10;
 	file3["training_data_10"] >> trainingData10;
 	file3.release();
-
+/*
 	dirname = orig_dirname;
 	filename = dirname.append("trainingdata11.yaml");
 	FileStorage file4(filename, FileStorage::READ);
 	Mat trainingData11;
 	file4["training_data_11"] >> trainingData11;
 	file4.release();
+*/
+	vconcat(trainingData01, trainingData10, trainingData);
+	//vconcat(trainingData, trainingData10, trainingData);
+	//vconcat(trainingData, trainingData11, trainingData);
 
-	vconcat(trainingData00, trainingData01, trainingData);
-	vconcat(trainingData, trainingData10, trainingData);
-	vconcat(trainingData, trainingData11, trainingData);
-
-	Mat response1(trainingData00.rows, 1, DataType<float>::type);
+	//Mat response1(trainingData00.rows, 1, DataType<float>::type);
 	Mat response2(trainingData01.rows, 1, DataType<float>::type);
 	Mat response3(trainingData10.rows, 1, DataType<float>::type);
-	Mat response4(trainingData11.rows, 1, DataType<float>::type);
-	response1 = Scalar(0); response2 =Scalar(1); response3 =Scalar(2); response4 =Scalar(3);
+	//Mat response4(trainingData11.rows, 1, DataType<float>::type);
+	//response1 = Scalar(0);
+	response2 =Scalar(1); response3 =Scalar(2);
+	//response4 =Scalar(3);
 
-	vconcat(response1, response2, response);
-	vconcat(response, response3, response);
-	vconcat(response, response4, response);
+	//vconcat(response1, response2, response);
+	vconcat(response2, response3, response);
+	//vconcat(response, response4, response);
+	/*
+	FileStorage temp("training.xml", FileStorage::WRITE);
+	temp<<"training_data"<<trainingData;
+	temp.release();
+	*/
 }
