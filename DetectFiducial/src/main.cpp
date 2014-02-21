@@ -125,6 +125,8 @@ int main(int argc, char* argv[])
 	createTrainingData(dirname, trainingData, response);
 	const int K =11;
 	CvKNearest knn(trainingData, response, Mat(), false, K);
+
+	Mat output = input.clone();
 	for(int i=0; i<numClusters; i++)
 	{
 		float * row = (float *)&clusters.at<float>(i,0);
@@ -134,6 +136,7 @@ int main(int argc, char* argv[])
 		int y2 = row[3];
 		Mat pts;
 		Point pt1(x1,y1), pt2(x2,y2);
+
 #ifdef DEBUG2
 	  rectangle(clonedgaborOutput, pt1, pt2, Scalar(255,0,0) );
 	  imshow("gabor", clonedgaborOutput);
@@ -150,36 +153,49 @@ int main(int argc, char* argv[])
 		intensity_profile.clear();
 		int num_rings = -1;
 		found = detectCode(pts, x1, y1, x2, y2, input, intensity_profile, num_rings);
+		char classid[2];
+		string str = "Class:";
 		if(found)
 		{
+			rectangle(output, pt1, pt2, Scalar(0,255,0));
 			if(num_rings ==1 ){
-			Mat sample(1, 100, DataType<float>::type);
-			Mat profile_mat(intensity_profile);
-			transpose(profile_mat, profile_mat);
-			resize(profile_mat, sample, sample.size());
-/*
+				Mat sample(1, 100, DataType<float>::type);
+				Mat profile_mat(intensity_profile);
+				transpose(profile_mat, profile_mat);
+				resize(profile_mat, sample, sample.size());
+				/*
 		FileStorage file("test2.xml", FileStorage::WRITE);
 		file<<"Orig_sample"<<profile_mat;
 		file<<"Sample"<<sample;
 		file.release();
-*/
-			Mat responses(K,1,DataType<float>::type);
-			const float ** neighbours;
+				 */
+				Mat responses(K,1,DataType<float>::type);
+				const float ** neighbours;
 
-			Mat results(sample.rows, 1, DataType<float>::type);
-			Mat dist(K, 1, DataType<float>::type);
-			knn.find_nearest (sample, K, results, responses, dist);
-			cout<<"Class:"<<results.at<float>(0)<<"\n";
+				Mat results(sample.rows, 1, DataType<float>::type);
+				Mat dist(K, 1, DataType<float>::type);
+				knn.find_nearest (sample, K, results, responses, dist);
+				int class_id = results.at<float>(0);
+				cout<<"Class:"<<class_id<<"\n";
+				classid[0] = class_id+48;
+				classid[1] = '\0';
+				str.append(classid);
 			}
 			else{
-				if(num_rings == 0)
+				if(num_rings == 0){
 					cout<<"Class:"<<0<<"\n";
-				else if(num_rings == 2)
+					str.append("0");
+				}
+				else if(num_rings == 2){
 					cout<<"Class:"<<3<<"\n";
+					str.append("3");
+				}
 			}
+			putText(output, str, pt2, FONT_HERSHEY_PLAIN, 1, Scalar(255,0,0));
 			break;
 		}
 	}
+	imwrite("output.jpg", output);
 	if(!found){
 		cout<<"Code not detected\n";
 	}else{
