@@ -11,7 +11,7 @@
 \begin{document}
 % \renewcommand\thelinenumber{\color[rgb]{0.2,0.5,0.8}\normalfont\sffamily\scriptsize\arabic{linenumber}\color[rgb]{0,0,0}}
 % \renewcommand\makeLineNumber {\hss\thelinenumber\ \hspace{6mm} \rlap{\hskip\textwidth\ \hspace{6.5mm}\thelinenumber}}
-% \linenumbers
+% \linenumbers \
 \pagestyle{headings}
 \mainmatter
 \def\ECCV12SubNumber{***}  % Insert your submission number here
@@ -26,32 +26,69 @@
 \author{Anonymous ECCV submission}
 \institute{Paper ID \ECCV12SubNumber}
 
-
 \maketitle
 
 \begin{abstract}
+Fiducial markers are commonly used to track an object in an unknown environment
+and finds use in various applications in Virtual Reality, Medical imaging,
+Surveys, etc. The performance of popular fiducials is satisfactory when there is
+little motion or no motion in the device obtaining the imagery. But when there
+is continuous and swift motion, as in the case of low cost quadcopters,
+performance of these fiducials degrade significantly due to motion blur.
+Inspired from Circular Data Matrix\cite{NaimarkF02} we have designed a fiducial
+that may be thought of as a binary code.  It contains concentric white rings of
+equal widths on a black background with a blurred border. Our
+algorithm is based on the fact that there is no blur in the direction
+perpendicular to the direction of the motion.
 
 \end{abstract}
 
 \section{Introduction}
+A fiducial marker or simply a fiducial is an synthetic object placed in the
+scene, which can provide additional information about the environment.
 
-\subsection{Motivation}
-Tracking vehicle by an autonomous vehicle. \\
-Fiducials for tracking under motion blur.
+Low cost quadcopters such as AR Drone are very unstable which causes non-uniform
+motion resulting lot of motion blur in captured images. Also, as image transfer
+is done through wireless media using UDP, there is possibility of missing 
+intermediate frames . It results in lower frame rate (maximum 20-25 frames per
+second (FPS)) instead of normal rate of 30 FPS. This dropping of frames may
+cause drastic change in position of object in successive frames. Thus,
+performance of traditional tracking methods is not satisfactory for tracking
+through quadcopters. Our aim is to design a fiducial which we will be able to track under significant
+amount of motion blur and is robust in terms of drastic change in its position
+in successive frames.
+
+We observed that blur in a single frame captured through quadcopter is linear.
+There is no blur in the direction perpendicular to the direction of motion. We
+tried to design a fiducial whose ``signature'' remains intact in any direction.
+
  
 \section{Related Work}
-ARToolkit \cite{ARToolkit02} \cite{kato-artoolkit} /ARTag \cite{Fiala05} \\
+The ARToolkit \cite{ARToolkit02} \cite{kato-artoolkit} is well known toolkit in
+AR system, widely used to find pose of the object on which it is placed.
+Fiala et.al \cite{Fiala05} developed fiducial named, ARTag, bi-tonal system
+containing 2002 planar markers, each consisting of a square border and an
+interior region filled with a 6x6 grid of black or white cells. It proved to be
+more efficient than \cite{ARToolkit02} in terms of detection rate as well as the
+number of different patterns which can be created.  
+
+Concentric Rings\cite{concentric} \\
+Multicolor rings \cite{Cho:2001} \cite{Cho97fastcolor} \\
 Circular Data Matrix Fiducial System \cite{NaimarkF02} \\
-Reliable Fiducial Detection in Natural Scenes \cite{ClausF04}\\
+
+Zhang el. al.\cite{Zhang:2002} and Claus et. al. \cite{ClausF04} have done
+quite comprehensive comparative study of various fiducial marker systems with
+respect to processing time, recognition rate and accuracy with
+respect to viewing angle and distance.
+
 RUNE-Tag \cite{runetag11} \\
 Pi-Tag \cite{Pitag13} \\
 Blut \cite{Wu:2011}
 
-\section{Our Contribution}
 
-\subsection{Design of Fiducial}
+\section{Design of Fiducial}
 
-\subsection{Fiducial Detection Algorithm}
+\section{Fiducial Detection Algorithm}
 \begin{itemize}
   \item Apply Gabor Filter on input image
   \item Find Connected components in Gabor output
@@ -75,10 +112,12 @@ compare our results with Blur driven tracker.
 \subsubsection{Comparison with ARTag}
 \subsubsection{Comparison with Blut} 
 
-\section{Conclusion}
+\section{Discussion}
 
-\section{Future Work}
+\section{Conclusion and Future Work}
+
 Pose Estimation
+
 \bibliographystyle{splncs}
 \bibliography{egbib}
 
