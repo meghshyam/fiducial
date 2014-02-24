@@ -87,8 +87,31 @@ Blut \cite{Wu:2011}
 
 
 \section{Design of Fiducial}
+Inspired from Circular Data Matrix\cite{NaimarkF02} we have designed a fiducial
+that may be thought of as a binary code.  It contains concentric white rings of
+equal widths on a black background with a blurred border. The outermost and
+innermost rings represent the start and end of the code and is embedded in the
+fiducial; these are not considered part of the code itself. The binary code is
+represented by the presence (or absence) of rings between ``marker'' rings.
+Depending on which ring is present or absent, the resulting binary code will
+change. The number of different patterns depends on the number of bits in the
+binary code. For example, if the binary code has three bits, there will be a
+maximum of three rings between``marker'' rings and we end up with eight
+different patterns.
+
+\begin{figure}
+\centering
+  \includegraphics[width=.2\linewidth]{newconcentric_00.pdf}  
+  \includegraphics[width=.2\linewidth]{newconcentric_01.pdf}
+  \includegraphics[width=.2\linewidth]{newconcentric_10.pdf}
+  \includegraphics[width=.2\linewidth]{newconcentric_11.pdf}
+  \caption{Two bit binary coded Fiducials (from left to right: Binary Code 00,
+  Binary Code 01, Binary Code 10, Binary Code 11)}
+  \label{fig:fiducials}
+\end{figure}
 
 \section{Fiducial Detection Algorithm}
+Overall flow of fiducial detection algorithm can be summarised as follows:
 \begin{itemize}
   \item Apply Gabor Filter on input image
   \item Find Connected components in Gabor output
@@ -105,7 +128,30 @@ Blut \cite{Wu:2011}
   \end{itemize}
 \end{itemize}
 
-\section{Experimental Results}
+\textbf{Gabor Filter}: A 2D Gabor filter is a Gaussian kernel function modulated
+by a sinusoidal plane wave\cite{GaborFilter}. It is used to find high gradient
+patches from the image. In our case, it will detect blur invariant sections of the fiducials We
+have applied Gabor filter for eight different orientations and then calculated
+L2 norm of all outputs.
+
+\textbf{Clustering}: Connected components are found from the Gabor output. 
+These connected components are then clustered in hierarchical fashion, to find
+the group of closely positioned patches.
+
+\textbf{PCA}: Principal Component Analysis is done on the clustered Gabor
+output. Along 1st principal component, intensity profile in the original image is found.
+Number of transitions in the intensity profile will give us the number of rings.
+
+\textbf{Classification}: Each synthetic fiducial pattern is blurred along 36
+orientations (0, 10, 20, \ldots , 350) and intensity profile along first
+principal component from every output is taken as training data for that fiducial pattern.
+Training data for patterns having same number of rings is grouped together;
+e.g., in two bit binary coded fiducial, training data for pattern “01” and “10”
+will be grouped together. Now, depending on the number of detected rings, test
+pattern is matched against corresponding training data using K-Nearest Neighbor
+Classifier (K=5).
+
+\section{Experimental Validation}
 \subsection{Comparison}
 We will compare our results with standard fiducials such as ARTag. Also, we will
 compare our results with Blur driven tracker.
