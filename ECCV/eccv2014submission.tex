@@ -1,5 +1,5 @@
 % last updated in April 2002 by Antje Endemann
-% Based on CVPR 07 and LNCS, with modifications by DAF, AZ and elle, 2008 and AA, 2010, and CC, 2011
+% Based on CVPR 07 and LNCS, with modifications by DAF, AZ and elle, 2008 and AA, 2010, and CC, 2011; TT, 2014
 
 \documentclass[runningheads]{llncs}
 \usepackage{graphicx}
@@ -13,89 +13,75 @@
 % \linenumbers
 \pagestyle{headings}
 \mainmatter
-\def\ECCV12SubNumber{***}  % Insert your submission number here
+\def\ECCV14SubNumber{***}  % Insert your submission number here
 
 \title{Author Guidelines for ECCV Submission} % Replace with your title
 
-\titlerunning{ECCV-12 submission ID \ECCV12SubNumber}
+\titlerunning{ECCV-14 submission ID \ECCV14SubNumber}
 
-\authorrunning{ECCV-12 submission ID \ECCV12SubNumber}
+\authorrunning{ECCV-14 submission ID \ECCV14SubNumber}
 
 \author{Anonymous ECCV submission}
-\institute{Paper ID \ECCV12SubNumber}
+\institute{Paper ID \ECCV14SubNumber}
 
 
 \maketitle
 
 \begin{abstract}
-The abstract should summarize the contents of the paper and should
-contain at least 70 and at most 300 words. It should be set in 9-point
+The abstract should summarize the contents of the paper. LNCS guidelines
+indicate it should be at least 70 and at most 150 words. It should be set in 9-point
 font size and should be inset 1.0~cm from the right and left margins.
 \dots
+\keywords{We would like to encourage you to list your keywords within
+the abstract section}
 \end{abstract}
 
 
 \section{Introduction}
 
 
-Please follow the steps outlined below when submitting your manuscript.
+This document serves as an example submission. It illustrates the format
+we expect authors to follow when submitting a paper to ECCV. 
+At the same time, it gives details on various aspects of paper submission,
+including preservation of anonymity and how to deal with dual submissions,
+so we advise authors to read this document carefully.
 
-%-------------------------------------------------------------------------
+\section{Paper formatting}
 
 \subsection{Language}
 
 All manuscripts must be in English.
 
 \subsection{Paper length}
-The basic length is 12 pages, but up to two additional pages may be
-purchased in the final printed proceedings. This brings the {\em
-maximum} length for submission to 14 pages. Overlength papers will
-simply not be reviewed. This includes papers where the margins and
+Papers submitted for review should be complete. 
+The length should match that intended for final publication. 
+Papers accepted for the conference will be allocated 14 pages (plus references) in the proceedings. 
+Note that the allocated 14 pages do not include the references. The reason for this policy
+is that we do not want authors to omit references for sake of space limitations.
+
+Papers with more than 14 pages (excluding references) will be rejected without review.
+This includes papers where the margins and
 formatting are deemed to have been significantly altered from those
 laid down by this style guide.  The reason such papers will not be
 reviewed is that there is no provision for supervised revisions of
 manuscripts. The reviewing process cannot determine the suitability of
 the paper for presentation in 14 pages if it is reviewed in 16.
 
-\subsection{Dual submission}
+\subsection{Paper ID}
 
-By submitting a manuscript to ECCV, the author(s) assert that it
-has not been previously published in substantially similar form.
-Furthermore, no paper which contains significant overlap with the
-contributions of this paper either has been or will be submitted
-during the ECCV 2012 review period to either a journal or a
-conference.
+It is imperative that the paper ID is mentioned on each page of the manuscript.
+The paper ID is a number automatically assigned to your submission when 
+registering your paper submission on CMT.
 
-If there are any papers that may appear to the reviewers to violate
-this condition, then it is your responsibility to (1) cite these
-papers (preserving anonymity as described in section~\ref{sec:blind}
-of this example paper, (2) argue in the body of your paper why your
-ECCV paper is nontrivially different from these concurrent
-submissions, and (3) include anonymized versions of those papers in
-the supplemental material.
 
-\subsection{Supplemental Material}
-
-Authors may optionally upload supplemental material. Typically, this
-material might include videos of results that cannot be included in
-the main paper, anonymized related submissions to other conferences
-and journals, and appendices or technical reports containing extended
-proofs and mathematical derivations that are not essential for
-understanding of the paper. Note that the contents of the supplemental
-material should be referred to appropriately in the paper and that
-reviewers are not obliged to look at it.
-
-All supplemental material must be zipped or tarred into a single
-file. There is a 50MB limit on the size of this file. The deadline for
-supplemental material is five days after the main paper deadline.
-
-%-------------------------------------------------------------------------
 \subsection{Line numbering}
 
 All lines should be numbered, as in this example document.  This makes
 reviewing more efficient, because reviewers can refer to a line on a
 page.  If you are preparing a document using a non-\LaTeX\
 document preparation system, please arrange for an equivalent line numbering.
+
+
 
 \subsection{Mathematics}
 
@@ -109,21 +95,20 @@ equation second from the top of page 3 column 1''.  (Note that the
 line numbering will not be present in the final copy, so is not an
 alternative to equation numbers).  Some authors might benefit from
 reading Mermin's description of how to write mathematics:
-\url{http://www.cvpr.org/doc/mermin.pdf}.
-
+\url{www.pamitc.org/documents/mermin.pdf‎}.
 
 \section{Blind review}
 \label{sec:blind}
 
 Many authors misunderstand the concept of anonymizing for blind
 review.  Blind review does not mean that one must remove
-citations to one's own work---in fact it is often impossible to
+citations to one's own work. In fact it is often impossible to
 review a paper unless the previous citations are known and
 available.
 
 Blind review means that you do not use the words ``my'' or ``our''
 when citing previous work.  That is all.  (But see below for
-techreports).
+technical reports).
 
 Saying ``this builds on the work of Lucy Smith [1]'' does not say
 that you are Lucy Smith, it says that you are building on her
@@ -158,7 +143,7 @@ An example of an excellent paper:
    all previously known methods.  Why the previous paper
    was accepted without this analysis is beyond me.
 
-   [1] Smith, L and Jones, C. ``The frobnicatable foo
+   [1] Smith, L. and Jones, C. ``The frobnicatable foo
    filter, a fundamental contribution to human knowledge''.
    Nature 381(12), 1-213.
 \end{quote}
@@ -168,10 +153,10 @@ time, which covers similar or overlapping material, you may need
 to refer to that submission in order to explain the differences,
 just as you would if you had previously published related work. In
 such cases, include the anonymized parallel
-submission~\cite{Authors12} as additional material and cite it as
+submission~\cite{Authors14} as additional material and cite it as
 \begin{quote}
-1. Authors. ``The frobnicatable foo filter'', BMVC 2012 Submission
-ID 324, Supplied as additional material {\tt bmvc12.pdf}.
+1. Authors. ``The frobnicatable foo filter'', BMVC 2014 Submission
+ID 324, Supplied as additional material {\tt bmvc14.pdf}.
 \end{quote}
 
 Finally, you may feel you need to tell the reader that more
@@ -179,7 +164,7 @@ details can be found elsewhere, and refer them to a technical
 report.  For conference submissions, the paper must stand on its
 own, and not {\em require} the reviewer to go to a techreport for
 further details.  Thus, you may say in the body of the paper
-``further details may be found in~\cite{Authors12b}''.  Then
+``further details may be found in~\cite{Authors14b}''.  Then
 submit the techreport as additional material. Again, you may not
 assume the reviewers will read this material.
 
@@ -218,15 +203,15 @@ written by Zeus, but cannot make any decision based on that guess.
 He or she would have to be sure that no other authors could have been
 contracted to solve problem B. \\
 
-\noindent FAQ: Are acknowledgements OK?  No. Please {\bf omit
-acknowledgements} in your review copy; they can go in the final copy.
+For sake of anonymity, it's recommended to omit acknowledgements
+in your review copy. They can be added later when you prepare the final copy.
 
 
 
 \section{Manuscript Preparation}
-This is an edited version of Springer LNCS instructions adapted
-for ECCV 2012 first paper submission.
 
+This is an edited version of Springer LNCS instructions adapted
+for ECCV 2014 first paper submission.
 You are strongly encouraged to use \LaTeX2$_\varepsilon$ for the
 preparation of your
 camera-ready manuscript together with the corresponding Springer
@@ -335,7 +320,7 @@ The distance between text and figure should be about 8~mm, the
 distance between figure and caption about 5~mm.
 \begin{figure}
 \centering
-\includegraphics[height=7.2cm]{eijkel2}
+\includegraphics[height=6.5cm]{eijkel2}
 \caption{One kernel at $x_s$ ({\it dotted kernel}) or two kernels at
 $x_i$ and $x_j$ ({\it left and right}) lead to the same summed estimate
 at $x_s$. This shows a figure consisting of different types of
@@ -369,12 +354,24 @@ For example,
 Please punctuate a displayed equation in the same way as ordinary
 text but with a small space before the end punctuation.
 
+\subsection{Footnotes}
+
+The superscript numeral used to refer to a footnote appears in the text
+either directly after the word to be discussed or, in relation to a
+phrase or a sentence, following the punctuation sign (comma,
+semicolon, or full stop). Footnotes should appear at the bottom of
+the
+normal text area, with a line of about 2~cm in \TeX\ and about 5~cm in
+Word set
+immediately above them.\footnote{The footnote numeral is set flush left
+and the text follows with the usual word spacing. Second and subsequent
+lines are indented. Footnotes should end with a full stop.}
+
+
 \subsection{Program Code}
 
 Program listings or program commands in the text are normally set in
 typewriter font, e.g., CMTT10 or Courier.
-
-\medskip
 
 \noindent
 {\it Example of a Computer Program}
@@ -406,18 +403,6 @@ end.
 report. Springer, New York)}
 
 
-\subsection{Footnotes}
-
-The superscript numeral used to refer to a footnote appears in the text
-either directly after the word to be discussed or -- in relation to a
-phrase or a sentence -- following the punctuation sign (comma,
-semicolon, or full stop). Footnotes should appear at the bottom of
-the
-normal text area, with a line of about 2~cm in \TeX\ and about 5~cm in
-Word set
-immediately above them.\footnote{The footnote numeral is set flush left
-and the text follows with the usual word spacing. Second and subsequent
-lines are indented. Footnotes should end with a full stop.}
 
 \subsection{Citations}
 
@@ -433,10 +418,12 @@ end of this information sheet. For citations in the text please use
 square brackets and consecutive numbers: \cite{Alpher02},
 \cite{Alpher03}, \cite{Alpher04} \dots
 
+\section{Conclusions}
 
-\bibliographystyle{splncs}
-\bibliography{egbib}
+The paper ends with a conclusion. 
 
+
+\clearpage\mbox{}Page \thepage\ of the manuscript.
 \clearpage\mbox{}Page \thepage\ of the manuscript.
 \clearpage\mbox{}Page \thepage\ of the manuscript.
 \clearpage\mbox{}Page \thepage\ of the manuscript.
@@ -445,5 +432,11 @@ square brackets and consecutive numbers: \cite{Alpher02},
 \clearpage\mbox{}Page \thepage\ of the manuscript.
 This is the last page of the manuscript.
 \par\vfill\par
-Now we have reached the maximum size of the ECCV 2012 submission.
+Now we have reached the maximum size of the ECCV 2014 submission (excluding references).
+References should start immediately after the main text, but can continue on p.15 if needed.
+
+\clearpage
+
+\bibliographystyle{splncs}
+\bibliography{egbib}
 \end{document}

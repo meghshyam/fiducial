@@ -10,7 +10,7 @@
 % a reference with (e.g.) \cite{smith77} to get a "[1]" in the text.
 
 % Copyright (C) 1999 Jason Noble.
-% Last updated: Thursday 20 May 1999, 13:22:19
+% Last updated: Friday 07 March 2006, 08:04:42  Frank Holzwarth, Springer
 %
 % Based on the BibTeX standard bibliography style `unsrt'
 
@@ -337,8 +337,18 @@ FUNCTION {n.dashify}
 
 FUNCTION {format.date}
 { year empty$
-   { "there's no year in " cite$ * warning$ }
-    'year
+    { month empty$
+        { "" }
+        { "there's a month but no year in " cite$ * warning$
+          month
+        }
+      if$
+    }
+    { month empty$
+        'year
+        { month " " * year * }
+      if$
+    }
   if$
 }
 
@@ -441,6 +451,14 @@ FUNCTION {format.pages}
 
 FUNCTION {format.vol}
 { volume bold
+}
+
+FUNCTION {format.vol.num}
+{ volume bold
+number empty$
+{ }
+{ number "(" swap$ * * ")" * }
+if$
 }
 
 FUNCTION {pre.format.pages}
@@ -591,7 +609,7 @@ FUNCTION {article}
   new.block
   crossref missing$
     { journal emphasize "journal" output.check
-      format.vol output
+      format.vol.num output
       format.date parens output
       format.pages output
     }
