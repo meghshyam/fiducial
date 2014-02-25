@@ -35,13 +35,15 @@ Surveys, etc. The performance of popular fiducials is satisfactory when there is
 little motion or no motion in the device obtaining the imagery. But when there
 is continuous and swift motion, as in the case of low cost quadcopters,
 performance of these fiducials degrade significantly due to motion blur.
-Inspired from Circular Data Matrix\cite{NaimarkF02} we have designed a fiducial
-that may be thought of as a binary code.  It contains concentric white rings of
-equal widths on a black background with a blurred border. Our
+Inspired from Circular Data Matrix\cite{NaimarkF02}, we have designed a fiducial
+that may be thought of as a binary code. It contains concentric white rings of
+equal widths on a black background with a blurred border. Our fiducial detection
 algorithm is based on the fact that there is no blur in the direction
-perpendicular to the direction of the motion.
-\dots
-\keywords{Fiducials, Blur Invariant Tracking,}
+perpendicular to the direction of the motion. We will show through experimental
+validation that our fiducial works better than popular fiducials such as
+ARTag under signifacant motion blur.
+
+\keywords{Fiducials, Tracking, Blur Invariant}
 \end{abstract}
 
 \section{Introduction}
@@ -50,14 +52,14 @@ scene, which can provide additional information about the environment.
 
 Low cost quadcopters such as AR Drone are very unstable which causes non-uniform
 motion resulting lot of motion blur in captured images. Also, as image transfer
-is done through wireless media using UDP, there is possibility of missing 
-intermediate frames . It results in lower frame rate (maximum 20-25 frames per
-second (FPS)) instead of normal rate of 30 FPS. This dropping of frames may
-cause drastic change in position of object in successive frames. Thus,
-performance of traditional tracking methods is not satisfactory for tracking
-through quadcopters. Our aim is to design a fiducial which we will be able to
-track under significant amount of motion blur and is robust in terms of drastic
-change in its position in successive frames.
+is done through wireless media using User Datagram Protocol (UDP), there is
+possibility of missing intermediate frames . It results in lower frame rate
+(around 15 frames per second (FPS)) instead of normal rate of 30 FPS. This
+frequent dropping of frames may cause drastic change in position of object in
+successive frames. Thus, performance of traditional tracking methods is not
+satisfactory for tracking through quadcopters. Our aim is to design a fiducial
+which we will be able to track under significant amount of motion blur and is
+robust in terms of drastic change in its position in successive frames.
 
 We observed that blur in a single frame captured through quadcopter is linear.
 There is no blur in the direction perpendicular to the direction of motion. We
@@ -66,26 +68,30 @@ tried to design a fiducial whose ``signature'' remains intact in any direction.
  
 \section{Related Work}
 The ARToolkit \cite{ARToolkit02} \cite{kato-artoolkit} is well known toolkit in
-AR system, widely used to find pose of the object on which it is placed.
-Fiala et.al \cite{Fiala05} developed fiducial named, ARTag, bi-tonal system
-containing 2002 planar markers, each consisting of a square border and an
-interior region filled with a 6x6 grid of black or white cells. It proved to be
-more efficient than \cite{ARToolkit02} in terms of detection rate as well as the
-number of different patterns which can be created.  
+Augmented Reality system, widely used to find pose of the object on which it is
+placed.  Fiala et al. \cite{Fiala05} developed fiducial named, ARTag, bi-tonal
+system containing 2002 planar markers, each consisting of a square border and
+an interior region filled with a 6x6 grid of black or white cells. It proved to
+be more efficient than \cite{ARToolkit02} in terms of marker recognition rate
+as well as the number of different patterns which can be created.  
 
-Concentric Rings\cite{NaimarkF02} \\
-Multicolor rings \cite{Cho:2001} \cite{Cho97fastcolor} \\
-Circular Data Matrix Fiducial System \cite{NaimarkF02} \\
+Concentric Rings are reported used first by Gatrell et al.\cite{concentric} for
+monocular pose estimation as well as object identification in space. Cho et al.
+\cite{Cho:2001}\cite{Cho97fastcolor} have used multi color rings in wide area
+tracking in large scale applications. In \cite{NaimarkF02}, Naimark et al.
+have developed ``Circular Data Matrix Fiducial System'', for wide area tracking.
 
-Zhang el. al.\cite{Zhang:2002} and Claus et. al. \cite{ClausF04} have done
+Zhang el. al.\cite{Zhang:2002} and Claus et al. \cite{ClausF04} have done
 quite comprehensive comparative study of various fiducial marker systems with
 respect to processing time, recognition rate and accuracy with
 respect to viewing angle and distance.
 
-RUNE-Tag \cite{runetag11} \\
-Pi-Tag \cite{Pitag13} \\
-Blut \cite{Wu:2011}
-
+Bergamasco et al. \cite{runetag11} developed RUNE-Tag, fiducial marker
+system which works under large amount of occlusion. Bergamasco et al. also 
+designed Pi-Tag \cite{Pitag13}, marker design based on projective
+invariants.
+Wu et al.\cite{Wu:2011} have developed BLUr-driven Tracker (BLUT) framework for
+tracking motion-blurred targets.
 
 \section{Design of Fiducial}
 Inspired from Circular Data Matrix\cite{NaimarkF02} we have designed a fiducial
@@ -102,16 +108,19 @@ different patterns.
 
 \begin{figure}
 \centering
-  \includegraphics[width=.2\linewidth]{newconcentric_00.pdf}  
-  \includegraphics[width=.2\linewidth]{newconcentric_01.pdf}
-  \includegraphics[width=.2\linewidth]{newconcentric_10.pdf}
-  \includegraphics[width=.2\linewidth]{newconcentric_11.pdf}
+  \includegraphics[width=.22\linewidth]{newconcentric_00.pdf}  
+  \includegraphics[width=.22\linewidth]{newconcentric_01.pdf}
+  \includegraphics[width=.22\linewidth]{newconcentric_10.pdf}
+  \includegraphics[width=.22\linewidth]{newconcentric_11.pdf}
   \caption{Two bit binary coded Fiducials (from left to right: Binary Code 00,
   Binary Code 01, Binary Code 10, Binary Code 11)}
   \label{fig:fiducials}
 \end{figure}
 
 \section{Fiducial Detection Algorithm}
+Our fiducial detection strategy is different from \cite{NaimarkF02} and works
+under significant amount of blur. Our algorithm is based on the fact that there
+is no blur in the direction perpendicular to the direction of the motion.
 Overall flow of fiducial detection algorithm can be summarised as follows:
 \begin{itemize}
   \item Apply Gabor Filter on input image
@@ -132,16 +141,17 @@ Overall flow of fiducial detection algorithm can be summarised as follows:
 \textbf{Gabor Filter}: A 2D Gabor filter is a Gaussian kernel function modulated
 by a sinusoidal plane wave. It is used to find high gradient patches from the
 image. In our case, it will detect blur invariant sections of the fiducials. We
-have applied Gabor filter for eight different orientations and then calculated
-L2 norm of all outputs.
+have applied Gabor filter for eight different orientations ($\theta = 0, 45,
+90, 135, 180, 225, 270, 315$) and then calculated L2 norm of all outputs.
 
 \textbf{Clustering}: Connected components are found from the Gabor output. 
 These connected components are then clustered in hierarchical fashion, to find
 the group of closely positioned patches.
 
 \textbf{PCA}: Principal Component Analysis is done on the clustered Gabor
-output. Along 1st principal component, intensity profile in the original image is found.
-Number of transitions in the intensity profile will give us the number of rings.
+output. Along first principal component, intensity profile in the original image
+is found. Number of transitions in the intensity profile will give us the
+number of rings.
 
 \textbf{Classification}: Each synthetic fiducial pattern is blurred along 36
 orientations (0, 10, 20, \ldots , 350) and intensity profile along first
@@ -212,10 +222,12 @@ compare our results with Blur driven tracker.
 \subsubsection{Comparison with Blut} 
 
 \section{Discussion}
-
+\begin{itemize}
+\item Processing Time
+\item False Positives and False Negatives
+\item Pose Estimation
+\end{itemize}
 \section{Conclusion and Future Work}
-
-Pose Estimation
 
 \bibliographystyle{splncs}
 \bibliography{egbib}
