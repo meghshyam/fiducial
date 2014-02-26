@@ -70,9 +70,14 @@ We observed that blur in a single frame captured through quadcopter is linear.
 There is no blur in the direction perpendicular to the direction of motion. We
 tried to design a fiducial whose ``signature'' remains intact in any direction.
 
+\begin{figure}
+\includegraphics[width=\linewidth]{teaser.pdf}
+\caption{Figure showing experimental setup and comparison of
+output of ALVAR\cite{alvar} (for detecting ARTag) versus output of our
+algorithm, in normal and blurred scene}
+\end{figure}
  
 \section{Related Work}
-
 Our problem may be classified broadly in two areas; fiducial markers and
 tracking. So, we will briefly discuss work done in both areas.
 \begin{figure}
@@ -153,6 +158,18 @@ frames. But in our case, due to frequntly dropping of intermediate frame, this
 criterion may not be satisfied.
  
 \section{Design of Fiducial}
+
+\begin{figure}
+\centering
+  \includegraphics[width=.22\linewidth]{newconcentric_00.pdf}  
+  \includegraphics[width=.22\linewidth]{newconcentric_01.pdf}
+  \includegraphics[width=.22\linewidth]{newconcentric_10.pdf}
+  \includegraphics[width=.22\linewidth]{newconcentric_11.pdf}
+  \caption{Two bit binary coded Fiducials (from left to right: Binary Code 00,
+  Binary Code 01, Binary Code 10, Binary Code 11)}
+  \label{fig:fiducials}
+\end{figure}
+
 Inspired from Circular Data Matrix\cite{NaimarkF02} we have designed a fiducial
 that may be thought of as a binary code.  It contains concentric white rings of
 equal widths on a black background with a blurred border. The outermost and
@@ -167,18 +184,11 @@ maximum of three rings between``marker'' rings and we end up with eight
 different patterns. Fig. \ref{fig:fiducials} shows two bit binary coded
 fiducials.
 
-\begin{figure}
-\centering
-  \includegraphics[width=.22\linewidth]{newconcentric_00.pdf}  
-  \includegraphics[width=.22\linewidth]{newconcentric_01.pdf}
-  \includegraphics[width=.22\linewidth]{newconcentric_10.pdf}
-  \includegraphics[width=.22\linewidth]{newconcentric_11.pdf}
-  \caption{Two bit binary coded Fiducials (from left to right: Binary Code 00,
-  Binary Code 01, Binary Code 10, Binary Code 11)}
-  \label{fig:fiducials}
-\end{figure}
-
 \section{Fiducial Detection Algorithm}
+\begin{figure}
+\includegraphics[width=\linewidth]{overall_flow.pdf}
+\caption{Overall Workflow}
+\end{figure}
 Our fiducial detection strategy is different from \cite{NaimarkF02} and works
 under significant amount of blur. Our algorithm is based on the fact that there
 is no blur in the direction perpendicular to the direction of the motion.
