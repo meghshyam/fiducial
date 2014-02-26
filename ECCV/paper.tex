@@ -3,7 +3,7 @@
 
 \documentclass[runningheads]{llncs}
 \usepackage{graphicx}
-\usepackage{caption}
+\usepackage[font=small]{caption}
 \usepackage{subcaption}
 \captionsetup{compatibility=false}
 \usepackage{amsmath,amssymb} % define this before the line numbering.
@@ -73,33 +73,33 @@ tried to design a fiducial whose ``signature'' remains intact in any direction.
  
 \section{Related Work}
 
+Our problem may be classified broadly in two areas; fiducial markers and
+tracking. So, we will briefly discuss work done in both areas.
 \begin{figure}
-
+ \begin{subfigure}[b]{0.19\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{intersense.jpg}
+  Intersense\cite{NaimarkF02}  
+ \end{subfigure}
  \begin{subfigure}[b]{0.19\textwidth}  
  \centering 
   \includegraphics[width=\linewidth]{pattKanji.pdf}
-  \caption{ARToolkit}  
+  ARToolkit\cite{ARToolkit02}  
  \end{subfigure}
  \begin{subfigure}[b]{0.19\textwidth}
   \centering
   \includegraphics[width=\linewidth]{ARtag.jpg}
-  \caption{ARTag}
- \end{subfigure}
- \begin{subfigure}[b]{0.19\textwidth}
-  \centering
-  \includegraphics[width=\linewidth]{intersense.jpg}
-  \caption{Intersense}  
- \end{subfigure}
+  ARTag\cite{Fiala05}
+ \end{subfigure} 
  \begin{subfigure}[b]{0.19\textwidth}
   \centering
   \includegraphics[width=\linewidth]{pifiducial.png}
-  \caption{Pi-Tag}  
+  Pi-Tag\cite{Pitag13}  
  \end{subfigure}
  \begin{subfigure}[b]{0.19\textwidth}
   \centering
-  \includegraphics[width=\linewidth]{newconcentric_01.pdf}
-  %\includegraphics[width=0.5\linewidth]{newconcentric_10.pdf}
-  \caption{Our Fiducial}  
+  \includegraphics[width=\linewidth]{newconcentric_01.pdf}  
+  Our Fiducial  
  \end{subfigure}
  \caption{Various Fiducial Marker Designs}
  \label{fig:previous_work}  
@@ -129,18 +129,28 @@ system which works under large amount of occlusion. Bergamasco et al. also
 designed Pi-Tag \cite{Pitag13}, marker design based on projective
 invariants.
 
-\subsection{Limitations}
 The main hurdle in detection of current fiducials is, the detecton of features;
 lines in \cite{ARToolkit02}, corners in \cite{Fiala05} while ellipses in
 \cite{Cho:2001}, \cite{Cho97fastcolor}, \cite{runetag11} and \cite{Pitag13}.
-Such features are very difficult to correctly detect under significant motion
+Such features are very difficult to detect accurately under significant motion
 blur. So, under blur, recognition rate of these fiducials is very low. 
 
-Wu et al.\cite{Wu:2011} have developed BLUr-driven Tracker (BLUT) framework for
-tracking motion-blurred targets. BLUT framework works well when there is
-uniform motion and the position of tracked object does not change drastically in
-successive frames. But in our case, due to frequntly dropping of intermediate
-frame, this criterion may not be satisfied. 
+Fiducial detection in video may be considered as tracking problem where tracked
+object is fiducial itself. Visual tracking plays an important role in
+surveillance, robotics, human computer interaction, and medical
+imaging\cite{Yilmaz:2006}. Yilmaz et al.\cite{Yilmaz:2006} have done survey of
+various tracking methods. Most tracking methods
+( \cite{Ross:2008} \cite{Wu:2009} \cite{Perez02} \cite{Mei:2009} ) assume image
+sequence to be blur free. But in reality, motion blur is inherent part of most
+of the videos. Wu et al.\cite{Wu:2011} have developed BLUr-driven Tracker (BLUT)
+framework for tracking motion-blurred targets. BLUT is based on the observation
+that although motion blurs degrade the visual features of the target, they, at
+thde same time, provide useful cues about the movements to help tracking.
+ 
+BLUT framework successfully tracks blurred target when there is uniform motion
+and the position of tracked object does not change drastically in successive
+frames. But in our case, due to frequntly dropping of intermediate frame, this
+criterion may not be satisfied.
  
 \section{Design of Fiducial}
 Inspired from Circular Data Matrix\cite{NaimarkF02} we have designed a fiducial
@@ -224,6 +234,12 @@ K-Nearest Neighbor Classifier (K=5).
 \end{figure}
 
 \section{Experimental Validation}
+First, we have used synthetic images to test resilience to blur. We have scaled
+down ARTag fiducial and our fiducial to size 150x150.  Then, we blurred both
+fiducials along all orientations using different scales. Finally, we tried to
+detect ARTag in these blurred images using ALVAR library\cite{alvar} and our fiducial
+using algorithm given in previous section.
+
 Our system has been tested on the image sequences captured from AR Drone
 quadcopter. Each image sequence contains frames containing different fiducial
 pattern. Sample output for each fiducial pattern is shown in Fig.
