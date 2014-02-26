@@ -17,7 +17,7 @@
 
 
 //#define TRAIN_MODE
-//#define DEBUG
+//define DEBUG
 //#define DEBUG2
 //#define DEBUG3
 
@@ -86,7 +86,9 @@ int main(int argc, char* argv[])
 	Mat gaborOutput(input.size(), CV_8UC1);
 	gbFilter.filter(input, gaborOutput);
 #ifdef DEBUG
-	Mat clonedgaborOutput = gaborOutput.clone();
+	//Mat clonedgaborOutput = gaborOutput.clone();
+	Mat clonedgaborOutput(gaborOutput.size(), CV_8UC3);
+	cvtColor(gaborOutput, clonedgaborOutput, CV_GRAY2BGR, 3);
 #endif
 
 #ifndef TRAIN_MODE
@@ -109,12 +111,13 @@ int main(int argc, char* argv[])
 		int y2 = row[3];
 		Point pt1(x1,y1), pt2(x2,y2);
 #ifdef DEBUG
-		rectangle(cloned_input, pt1, pt2, Scalar(0,255,0) );
+		rectangle(clonedgaborOutput, pt1, pt2, Scalar(0,255,0), 3);
 #endif
 	}
 #ifdef DEBUG
-	imshow("box",cloned_input);
-	waitKey();
+	imshow("box",clonedgaborOutput);
+	imwrite("cluster.jpg", clonedgaborOutput);
+	//waitKey();
 #endif
 
 	//Detect code in the bounding box
@@ -157,7 +160,7 @@ int main(int argc, char* argv[])
 		string str = "Class:";
 		if(found)
 		{
-			rectangle(output, pt1, pt2, Scalar(0,255,0));
+			rectangle(output, pt1, pt2, Scalar(0,255,0), 3);
 			if(num_rings ==1 ){
 				Mat sample(1, 100, DataType<float>::type);
 				Mat profile_mat(intensity_profile);
@@ -191,10 +194,15 @@ int main(int argc, char* argv[])
 					str.append("3");
 				}
 			}
-			putText(output, str, pt2, FONT_HERSHEY_PLAIN, 1, Scalar(255,0,0));
+			Point pt_text_start = pt2 - Point(0,23);
+			Point pt_text_end = pt2 + Point(82,0);
+			rectangle(output,pt_text_start, pt_text_end, Scalar(0,255,255),-1);
+			putText(output, str, pt2, FONT_HERSHEY_DUPLEX, 0.75, Scalar(0,0,255));
 			break;
 		}
 	}
+	//imshow("output", output);
+	waitKey();
 	imwrite("output.jpg", output);
 	if(!found){
 		cout<<"Code not detected\n";
@@ -280,6 +288,7 @@ bool detectCode(const Mat &pts, int left, int top, int right, int bottom, const 
 	int numPtsPerLine[3];
 	uchar * intensities[3];
 	vector<Point> line_pts[3];
+	Mat cloned_input = input.clone();
 
 	for(int index=0; index<3; index++)
 	{
@@ -372,13 +381,15 @@ bool detectCode(const Mat &pts, int left, int top, int right, int bottom, const 
 				}
 			}
 		}
-
-		/*if(upward_pts.size() > 0 && downward_pts.size() > 0){
+/*
+		if(upward_pts.size() > 0 && downward_pts.size() > 0){
 			Point first_pt = upward_pts.back();
 			Point last_pt = downward_pts.back();
-			line(input, first_pt, last_pt, Scalar(0,255,0));
-		}*/
+			if (index ==1)
+				line(cloned_input, first_pt, last_pt, Scalar(0,255,0), 3);
 
+		}
+*/
 		reverse(upward_pts.begin(), upward_pts.end());
 		line_pts[index] = upward_pts;
 		line_pts[index].insert(line_pts[index].end(), downward_pts.begin(), downward_pts.end());
@@ -392,6 +403,10 @@ bool detectCode(const Mat &pts, int left, int top, int right, int bottom, const 
 			intensities[index][i] = intensity_test;
 		}
 	}
+	/*
+	imshow("pca",cloned_input);
+	imwrite("pca.jpg", cloned_input);
+	*/
 #ifdef DEBUG
 	Mat cloned_input = input.clone();
 #endif
