@@ -11,6 +11,7 @@
 \usepackage{color}
 \usepackage{url}
 \usepackage[width=122mm,left=12mm,paperwidth=146mm,height=193mm,top=12mm,paperheight=217mm]{geometry}
+\usepackage{multirow}
 
 \begin{document}
 % \renewcommand\thelinenumber{\color[rgb]{0.2,0.5,0.8}\normalfont\sffamily\scriptsize\arabic{linenumber}\color[rgb]{0,0,0}}
@@ -44,27 +45,38 @@ Inspired from Circular Data Matrix\cite{NaimarkF02}, we have designed a fiducial
 that may be thought of as a binary code. It contains concentric white rings of
 equal widths on a black background with a blurred border. Our fiducial detection
 algorithm is based on the fact that there is no blur in the direction
-perpendicular to the direction of the motion. We will show through experimental
-validation that our fiducial works better than popular fiducials such as
-ARTag under signifacant motion blur.
+perpendicular to the direction of the motion. The algorithm finds this
+direction in a simple but accurate way. Then, we find ``signature'' of our
+fiducial along this direction and further classify it to find the actual code
+embedded in the fiducial. We will show through experimental validation that our
+fiducial works better than popular fiducials such as ARTag under signifacant motion blur.
 
 \keywords{Fiducials, Tracking, Blur Invariant}
 \end{abstract}
 
 \section{Introduction}
 A fiducial marker or simply a fiducial is an synthetic object placed in the
-scene, which can provide additional information about the environment.
+scene, which can provide additional information about the environment. Sometimes
+naturally available features in a scene may be used as replacement to fiducials.
+But, natural features may not be available always and quality cannot be
+guranteed in every scene. So, results are not satisfactory in uncontrolled
+environment and hence use of such features is limited. Artificial fiducials are
+widely used in Augmented Reality(AR)\cite{Zhang:2002}\cite{Dorfmuller99}
+applications, vision based navigation of robots\cite{Davison:2007} etc.
 
-Low cost quadcopters such as AR Drone are very unstable which causes non-uniform
-motion resulting lot of motion blur in captured images. Also, as image transfer
-is done through wireless media using User Datagram Protocol (UDP), there is
-possibility of missing intermediate frames . It results in lower frame rate
-(around 15 frames per second (FPS)) instead of normal rate of 30 FPS. This
-frequent dropping of frames may cause drastic change in position of object in
-successive frames. Thus, performance of traditional tracking methods is not
-satisfactory for tracking through quadcopters. Our aim is to design a fiducial
-which we will be able to track under significant amount of motion blur and is
-robust in terms of drastic change in its position in successive frames.
+Recently, use of Unmanned Aerial Vehicles(UAV) such as quadcopters is increased
+in various tracking activities (e.g. aerial surveillance, search and rescue
+operations etc.).Low cost quadcopters such as AR Drone are very unstable which
+causes non-uniform motion resulting lot of motion blur in captured images.
+Also, as image transfer is done through wireless media using User Datagram
+Protocol (UDP), there is possibility of missing intermediate frames . It
+results in lower frame rate (around 15 frames per second (FPS)) instead of
+normal rate of 30 FPS. This frequent dropping of frames may cause drastic
+change in position of object in successive frames. Thus, performance of
+traditional tracking methods is not satisfactory for tracking through
+quadcopters. Our aim is to design a fiducial which we will be able to track
+under significant amount of motion blur and is robust in terms of drastic
+change in its position in successive frames.
 
 We observed that blur in a single frame captured through quadcopter is linear.
 There is no blur in the direction perpendicular to the direction of motion. We
@@ -250,6 +262,9 @@ fiducials along all orientations using different scales. Finally, we tried to
 detect ARTag in these blurred images using ALVAR library\cite{alvar} and our fiducial
 using algorithm given in previous section.
 
+%\begin{tabular}
+
+%\end{tabular}
 Our system has been tested on the image sequences captured from AR Drone
 quadcopter. Each image sequence contains frames containing different fiducial
 pattern. Sample output for each fiducial pattern is shown in Fig.
