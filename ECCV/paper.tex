@@ -12,6 +12,12 @@
 \usepackage{url}
 \usepackage[width=122mm,left=12mm,paperwidth=146mm,height=193mm,top=12mm,paperheight=217mm]{geometry}
 \usepackage{multirow}
+\usepackage{tabularx}
+\newcolumntype{Y}{>{\centering\arraybackslash}X}
+\captionsetup[table]{belowskip=12pt,aboveskip=4pt}
+\setlength{\floatsep}{5pt plus 2pt minus 2pt}
+\setlength{\textfloatsep}{5pt plus 2pt minus 2pt}
+\setlength{\intextsep}{5pt plus 2pt minus 2pt}
 
 \begin{document}
 % \renewcommand\thelinenumber{\color[rgb]{0.2,0.5,0.8}\normalfont\sffamily\scriptsize\arabic{linenumber}\color[rgb]{0,0,0}}
@@ -115,7 +121,7 @@ tracking. So, we will briefly discuss work done in both areas.
  \end{subfigure}
  \begin{subfigure}[b]{0.19\textwidth}
   \centering
-  \includegraphics[width=\linewidth]{newconcentric_01.pdf}  
+  \includegraphics[width=\linewidth]{our_fiducial}  
   Our Fiducial  
  \end{subfigure}
  \caption{Various Fiducial Marker Designs}
@@ -262,9 +268,20 @@ fiducials along all orientations using different scales. Finally, we tried to
 detect ARTag in these blurred images using ALVAR library\cite{alvar} and our fiducial
 using algorithm given in previous section.
 
-%\begin{tabular}
+\begin{table}
+\caption{Comparison of recognition rate at various blur scales}
+\centering
+\begin{tabularx}{0.75\textwidth}{c *{6}{|Y}|}
+\cline{2-6}
+& \multicolumn{5}{ c |}{Recognition Rate (in percent)} \\
+\cline{2-6} & \multicolumn{5}{ c |}{Blur Scale} \\ \cline{2-6}
+& 30 & 35 & 40 & 45 & 50 \\ \cline{1-6}
+\multicolumn{1}{ | c | }{ARTAg} & 100 & 67 & 44 & 21 & 0 \\ \cline{1-6}
+\multicolumn{1}{ | c | }{Our Fiducial}  & 100  & 100  & 100  & 100 & 100\\
+\cline{1-6}
+\end{tabularx}
+\end{table}
 
-%\end{tabular}
 Our system has been tested on the image sequences captured from AR Drone
 quadcopter. Each image sequence contains frames containing different fiducial
 pattern. Sample output for each fiducial pattern is shown in Fig.
