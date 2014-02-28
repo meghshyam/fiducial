@@ -177,6 +177,47 @@ criterion may not be satisfied.
  
 \section{Design of Fiducial}
 
+We conducted a small experiment to test ARTag's resilience towards blur.
+We scaled down ARTag fiducial to size 150x150.  Then, we blurred ARTag 
+at various orientations using different scales. Finally, we tried to detect
+ARTag in these blurred images using ALVAR library\cite{alvar}.
+
+\begin{table}
+\caption{Recognition rate of AR Tag at various blur scales}
+\centering
+\begin{tabularx}{0.75\textwidth}{c *{6}{|Y}|}
+\cline{2-6}
+& \multicolumn{5}{ c |}{Recognition Rate (in percent)} \\
+\cline{2-6} & \multicolumn{5}{ c |}{Blur Scale} \\ \cline{2-6}
+& 30 & 35 & 40 & 45 & 50 \\ \cline{1-6}
+\multicolumn{1}{ | c | }{ARTAg} & 100 & 19 & 9 & 5 & 0 \\ \cline{1-6}
+\cline{1-6}
+\end{tabularx}
+\label{tab:ARTag_blur}
+\end{table}
+
+From Table \ref{tab:ARTag_blur}, it can be clearly seen that performance of
+ARTag drastically with increase in blur scale. 
+
+We have also analysed the recognition rate along different blur orientations at
+different blur scales. We found that per blur scale, at certain blur
+orientations, recognition of ARTag fails. Table shows the range of blur angles
+for which we are able to recognise the ARTag at different blur scales.
+
+\begin{table}
+\caption{Blur angle range}
+\centering
+\begin{tabularx}{0.75\textwidth}{|Y|Y|}
+\cline{1-2}
+Blur Scale & Blur Angle Range \\ \cline{1-2}
+35 & 32--58 \\ \cline{1-2}
+40 & 41--48 \\ \cline{1-2}
+45 & 41--48 \\ \cline{1-2}
+50 & 44--46 \\ \cline{1-2}
+\end{tabularx}
+\end{table}   
+   
+
 \begin{figure}
 \centering
   \includegraphics[width=.22\linewidth]{newconcentric_00.pdf}  
@@ -262,25 +303,6 @@ K-Nearest Neighbor Classifier (K=5).
 \end{figure}
 
 \section{Experimental Validation}
-First, we have used synthetic images to test resilience to blur. We have scaled
-down ARTag fiducial and our fiducial to size 150x150.  Then, we blurred both
-fiducials along all orientations using different scales. Finally, we tried to
-detect ARTag in these blurred images using ALVAR library\cite{alvar} and our fiducial
-using algorithm given in previous section.
-
-\begin{table}
-\caption{Comparison of recognition rate at various blur scales}
-\centering
-\begin{tabularx}{0.75\textwidth}{c *{6}{|Y}|}
-\cline{2-6}
-& \multicolumn{5}{ c |}{Recognition Rate (in percent)} \\
-\cline{2-6} & \multicolumn{5}{ c |}{Blur Scale} \\ \cline{2-6}
-& 30 & 35 & 40 & 45 & 50 \\ \cline{1-6}
-\multicolumn{1}{ | c | }{ARTAg} & 100 & 67 & 44 & 21 & 0 \\ \cline{1-6}
-\multicolumn{1}{ | c | }{Our Fiducial}  & 100  & 100  & 100  & 100 & 100\\
-\cline{1-6}
-\end{tabularx}
-\end{table}
 
 Our system has been tested on the image sequences captured from AR Drone
 quadcopter. Each image sequence contains frames containing different fiducial
