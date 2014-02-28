@@ -61,18 +61,23 @@ fiducial works better than popular fiducials such as ARTag under signifacant mot
 \end{abstract}
 
 \section{Introduction}
-A fiducial marker or simply a fiducial is an synthetic object placed in the
-scene, which can provide additional information about the environment. Sometimes
-naturally available features in a scene may be used as replacement to fiducials.
-But, natural features may not be available always and quality cannot be
-guranteed in every scene. So, results are not satisfactory in uncontrolled
-environment and hence use of such features is limited. Artificial fiducials are
-widely used in Augmented Reality(AR)\cite{Zhang:2002}\cite{Dorfmuller99}
+Recently, use of Unmanned Aerial Vehicles(UAV) such as quadcopters is increased
+in various tracking activities e.g. aerial surveillance, search and rescue
+operations etc. Navigation of these vehicles is mainly based on the
+onboard inertial sensors. But sensor based measurments are prone to errors. So,
+visual cues captured through onboard camera can be used along with the sensor
+based measurments.  But, natural features may not be available always and
+quality cannot be guranteed in every scene. So, results are not satisfactory in
+uncontrolled environment and hence use of such features is limited specifically
+when we need very high precision. 
+
+Artificial markers are used when we need high precision. A fiducial marker or
+simply a fiducial is an synthetic object placed in the scene, which can provide
+additional information about the environment. Artificial fiducials are widely 
+used in Augmented Reality(AR) \cite{Zhang:2002}\cite{Dorfmuller99}
 applications, vision based navigation of robots\cite{Davison:2007} etc.
 
-Recently, use of Unmanned Aerial Vehicles(UAV) such as quadcopters is increased
-in various tracking activities (e.g. aerial surveillance, search and rescue
-operations etc.).Low cost quadcopters such as AR Drone are very unstable which
+Low cost quadcopters such as AR Drone are very unstable which
 causes non-uniform motion resulting lot of motion blur in captured images.
 Also, as image transfer is done through wireless media using User Datagram
 Protocol (UDP), there is possibility of missing intermediate frames . It
@@ -125,7 +130,7 @@ tracking. So, we will briefly discuss work done in both areas.
   Our Fiducial  
  \end{subfigure}
  \caption{Various Fiducial Marker Designs}
- \label{fig:previous_work}  
+ \label{fig:previous_work}   
 \end{figure}
  
 The ARToolkit \cite{ARToolkit02} \cite{kato-artoolkit} is well known toolkit in
@@ -197,12 +202,16 @@ ARTag in these blurred images using ALVAR library\cite{alvar}.
 \end{table}
 
 From Table \ref{tab:ARTag_blur}, it can be clearly seen that performance of
-ARTag drastically with increase in blur scale. 
+ARTag drastically degrade with increase in blur scale. 
 
-We have also analysed the recognition rate along different blur orientations at
-different blur scales. We found that per blur scale, at certain blur
-orientations, recognition of ARTag fails. Table shows the range of blur angles
-for which we are able to recognise the ARTag at different blur scales.
+We have also analysed the recognition rate along different blur orientations
+(from 0 to 90 degrees) at different blur scales. We found that per blur scale,
+at certain blur orientations, recognition of ARTag fails. Table shows the range
+of blur angles for which we are able to recognise the ARTag at different blur
+scales. From Table \ref{tab:artag_blurangle}, it can be seen that, when blur
+scale is greater than 30, ARTag is not recognisable with horizontal blur
+orientation(blur angle near zero degrees) as well as vertial blur
+orientation(blur angle near 90 degrees).
 
 \begin{table}
 \caption{Blur angle range}
@@ -210,11 +219,13 @@ for which we are able to recognise the ARTag at different blur scales.
 \begin{tabularx}{0.75\textwidth}{|Y|Y|}
 \cline{1-2}
 Blur Scale & Blur Angle Range \\ \cline{1-2}
-35 & 32--58 \\ \cline{1-2}
-40 & 41--48 \\ \cline{1-2}
-45 & 41--48 \\ \cline{1-2}
-50 & 44--46 \\ \cline{1-2}
+30 & 0 -- 90\\ \cline{1-2}
+35 & 32 -- 58 \\ \cline{1-2}
+40 & 41 -- 48 \\ \cline{1-2}
+45 & 41 -- 48 \\ \cline{1-2}
+50 & 44 -- 46 \\ \cline{1-2}
 \end{tabularx}
+\label{tab:artag_blurangle}
 \end{table}   
    
 
