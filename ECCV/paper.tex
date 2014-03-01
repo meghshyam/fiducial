@@ -255,14 +255,47 @@ different patterns. Fig. \ref{fig:fiducials} shows two bit binary coded
 fiducials.
 
 \section{Fiducial Detection Algorithm}
+
+We have performed blur simulation experiment on Pi-tag \cite{Pitag13} to find
+how blur effects circular patterns. We tried to detect blurred Pi-tag using
+\cite{ros_pitag}.
+
+\begin{figure}
+\begin{subfigure}[b]{0.3\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{detect_noblur.jpg}
+  No Blur  
+ \end{subfigure}
+ \begin{subfigure}[b]{0.3\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{detect_blur15.jpg}
+  Blur Scale = 15  
+ \end{subfigure}
+ \begin{subfigure}[b]{0.3\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{nodetect_blur20.jpg}
+  Blur Scale = 20  
+ \end{subfigure}
+ \caption{Effect of blur on detection of Pi-Tag}
+ \label{fig:pitag_blur}
+\end{figure}
+
+From Fig. \ref{fig:pitag_blur}, it can be seen that, Pi-tag detection
+fails when blur scale is more than 15. The reason behind this is, Pi-tag
+detection is based on Ellipse detection which will fail in the presence of
+significant amount of blur. So, ellipse detection may not be the efficient way
+to detect circular patterns under blur.
+
 \begin{figure}
 \includegraphics[width=\linewidth]{overall_flow.pdf}
 \caption{Overall Workflow}
 \end{figure}
-Our fiducial detection strategy is different from \cite{NaimarkF02} and works
-under significant amount of blur. Our algorithm is based on the fact that there
+
+Our fiducial detection strategy is different from \cite{NaimarkF02}\cite{Pitag13} and
+works under significant amount of blur. Our algorithm is based on the fact that there
 is no blur in the direction perpendicular to the direction of the motion.
 Overall flow of fiducial detection algorithm can be summarised as follows:
+
 \begin{itemize}
   \item Apply Gabor Filter on input image
   \item Find Connected components in Gabor output
@@ -360,9 +393,59 @@ well as correctly classified them as shown in Fig. \ref{fig:output_all}
 
 \subsection{Comparison}
 We will compare our results with standard fiducials such as ARTag. Also, we will
-compare our results with Blur driven tracker.
+compare our results with Blur driven tracker(BLUT)\cite{Wu:2011}.
 \subsubsection{Comparison with ARTag}
-\subsubsection{Comparison with Blut} 
+
+\subsubsection{Comparison with BLUT} 
+We have used sample image sequence to test the performance of BLUT\cite{Wu:2011}
+and compare it with out result on the same image sequence. From Fig. \ref{fig:BLUT_output},
+it can be inferred that BLUT is able to track the fiducial when the position of
+fiducial doesnot change too much in successive frames. Also, it can be seen
+that, once BLUT looses the track of the fiducial, it is not able to recover from
+that. But, our algorithm is able to track the fiducial irrespecive of the change
+in the position of the fiducial in the image as shown in Fig.
+\ref{fig:our_output}.
+
+\begin{figure}
+\begin{subfigure}[b]{.19\textwidth}
+\includegraphics[width=\linewidth]{11.jpg}
+\end{subfigure}
+\begin{subfigure}[b]{.19\textwidth}
+\includegraphics[width=\linewidth]{12.jpg}
+\end{subfigure}
+\begin{subfigure}[b]{.19\textwidth}
+\includegraphics[width=\linewidth]{13.jpg}
+\end{subfigure}
+\begin{subfigure}[b]{.19\textwidth}
+\includegraphics[width=\linewidth]{14.jpg}
+\end{subfigure}
+\begin{subfigure}[b]{.19\textwidth}
+\includegraphics[width=\linewidth]{15.jpg}
+\end{subfigure}
+\caption{Output of BlUT on sample image sequence}
+\label{fig:BLUT_output}
+\end{figure}
+
+\begin{figure}
+\begin{subfigure}[b]{.19\textwidth}
+\includegraphics[width=\linewidth]{output11.jpg}
+\end{subfigure}
+\begin{subfigure}[b]{.19\textwidth}
+\includegraphics[width=\linewidth]{output12.jpg}
+\end{subfigure}
+\begin{subfigure}[b]{.19\textwidth}
+\includegraphics[width=\linewidth]{output13.jpg}
+\end{subfigure}
+\begin{subfigure}[b]{.19\textwidth}
+\includegraphics[width=\linewidth]{output14.jpg}
+\end{subfigure}
+\begin{subfigure}[b]{.19\textwidth}
+\includegraphics[width=\linewidth]{output15.jpg}
+\end{subfigure}
+\caption{Output of our algorithm on image sequence used in
+Fig. \ref{fig:BLUT_output}}
+\label{fig:our_output}
+\end{figure}
 
 \section{Discussion}
 \begin{itemize}
