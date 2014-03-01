@@ -298,7 +298,15 @@ under significant amount of blur.   In particular, we assume that scene motion
 blur be modelled locally as a linear motion blur~\cite{}.  Under this assumption,
 scene content perpendicular to the blur direction is unaffected by the blur.  Because
 of our circular design, this means the perpendicular direction can be observed as a 
-unblurred linear pattern.  Figure X shows an example with various motion directions.
+unblurred linear pattern.  Figure \ref{fig:blur_direction} shows an example with
+various motion directions.
+
+\begin{figure}
+\centering
+\includegraphics[width=\linewidth]{blur_direction.pdf}
+\caption{Relation of blur direction and unblurred linear pattern}
+\label{fig:blur_direction}
+\end{figure}
 
 Overall flow of fiducial detection algorithm can be summarised as follows:
 
@@ -322,7 +330,8 @@ image. In our case, it will detect blur invariant sections of the fiducials. We
 have applied Gabor filter for eight different orientations ($\theta = 0, 45,
 90, 135, 180, 225, 270, 315$). We have used following parameters for
 creating each Gabor kernel: $\lambda = 8$, $\gamma = 0.5$, $\sigma =
-0.56\lambda$, $\psi = 0 \text(for real) = \pi/2 (for imaginary part)$. 
+0.56\lambda$, $\psi = 0 \text{(for real part)}, \pi/2 \text{(for imaginary
+part)}$.
 Then L2 norm of outputs along all orientations is calculated and finally, L2
 normed image is binarized.
 
