@@ -10,10 +10,10 @@
 \usepackage{ruler}
 \usepackage{color}
 \usepackage{url}
+\usepackage{comment}
 \usepackage[width=122mm,left=12mm,paperwidth=146mm,height=193mm,top=12mm,paperheight=217mm]{geometry}
 \usepackage{multirow}
 \usepackage{tabularx}
-\setlength{\extrarowheight}{2pt}
 \newcolumntype{Y}{>{\centering\arraybackslash}X}
 \captionsetup[table]{belowskip=12pt,aboveskip=4pt}
 \setlength{\floatsep}{7pt plus 2pt minus 2pt}
@@ -43,63 +43,84 @@
 
 \begin{abstract}
 This paper describes the design and evaluation of a binary fiducial marker
-design for use with low-cost quadcopters.  Fiducial markers are commonly placed
-into environments to provide a reliable and unique scene marker conducive for
+for use with low-cost quadcopters.  Fiducial markers are commonly placed
+in environments to provide a reliable and unique marker conducive for
 tracking and recognition.   For quadcopter applications, fiducials are
 typically used for evaluating planning algorithms by allowing ground truth
 positions in the scene to be detected from the quadcopter's camera. Quadcopters,
-however, are subject to quick and unstable motions that causes notable motion
-blur that severely affects the detection rate of existing fiducial markers. 
+however, are subject to quick and unstable motions that can cause significant motion
+blur that severely affects the detection rate of existing fiducial markers.
 This motivated us to design a fiducial that is robust to motion blur. Our design
 uses a series of concentric circles with the observation is that the direction
 perpendicular to the motion blur direction will be unaffected by the blur and
-therefore still be recognized as a binary code.  We detail the design and
+therefore still be recognizable.  We detail the design and
 detection algorithm for our fiducial and show that our marker can significantly
-outperform existing fiducials on scenes captured with a quadcopter.
+outperform existing fiducial markers in scenes captured with a quadcopter.
 \keywords{Fiducials, Tracking, Detection using Blur}
 \end{abstract}
 
 \section{Introduction}
-Recently, use of Unmanned Aerial Vehicles(UAV) such as quadcopters is increased
-in various tracking activities e.g. aerial surveillance, search and rescue
-operations etc. Navigation of these vehicles is mainly based on the
-onboard inertial sensors. But sensor based measurments are prone to errors. So,
-visual cues captured through onboard camera can be used along with the sensor
-based measurments.  But, natural features may not be available always and
-quality cannot be guaranteed in every scene. So, results are not satisfactory in
-uncontrolled environment and hence use of such features is limited specifically
-when we need very high precision.
 
-Artificial markers are used when we need high precision. A fiducial marker or
-simply a fiducial is an synthetic object placed in the scene, which can provide
-additional information about the environment. Artificial fiducials are widely
-used in Augmented Reality(AR) \cite{Zhang:2002}\cite{Dorfmuller99}
-applications, vision based navigation of robots\cite{Davison:2007} etc.
+The recent availability of low-cost quadcopters has help to fuel significant efforts in
+research focused on Unmanned Aerial Vehicles.  Navigation and planning of
+these vehicles is typically performed using onboard inertial sensors and/or
+vision based modules that uses visual cues in the real world\cite{Davison:2007}. 
+However, to evaluate the effectiveness of navigation methods, artificial
+fiducial markers are commonly introduces into the environment to provide
+additional information that often serves for ground-truth
+measurements(e.g.\cite{Bosnak:2012}\cite{Lim09})
 
-Low cost quadcopters such as AR Drone are very unstable which
-causes non-uniform motion resulting lot of motion blur in captured images.
-Also, as image transfer is done through wireless media using User Datagram
-Protocol (UDP), there is possibility of missing intermediate frames . It
-results in lower frame rate (around 15 frames per second (FPS)) instead of
-normal rate of 30 FPS. This frequent dropping of frames may cause drastic
-change in position of object in successive frames. Thus, performance of
-traditional tracking methods is not satisfactory for tracking through
-quadcopters. Our aim is to design a fiducial which we will be able to track
-under significant amount of motion blur and is robust in terms of drastic
-change in its position in successive frames.
+In order to be effective, fiducial markers (or simply called, fiducials) need
+to be easily detected in the scene.  There are various existing commonly
+used fiducial markers 
+\cite{NaimarkF02}\cite{ARToolkit02}\cite{Fiala05}\cite{Pitag13}\cite{runetag11}.
+These typically take the form of binary codes arranged into rectangular grids (\cite{ARToolkit02}\cite{Fiala05})
+or other geometric features arranged in unique spatial patterns
+(\cite{NaimarkF02}\cite{Pitag13}\cite{runetag11}).
+Figure \ref{fig:teaser} shows an example of the popular ARTag\cite{Fiala05} as
+seen from a quad-copter.  One p roblem, however, is that low-cost quadcopters
+often exhibit very quick and erratic motion.  These fast physical movements
+results in motion blur in the quadcopters onboard camera.  Such motion blur has an adverse effect the
+reconition of fiducial  markers.  This can be seen in Figure \ref{fig:teaser}(b)
+where the ARTag cannot be recongized. This is not too surprising as most
+fidicuals are not explicitly designed to handle motion blur.  Compounding this
+problem is the common problem of dropped video frames from the quadcopters
+wireless communication module.   This means that no only is blurring
+introduced, but there may be large discountinues in the patterns position due
+to missing video frames that makes tracking challenging.
 
-We observed that blur in a single frame captured through quadcopter is linear.
-There is no blur in the direction perpendicular to the direction of motion. We
-tried to design a fiducial whose ``signature'' remains intact in any direction.
+To address this problem, propose a fiducial design that is robust to motion
+blur and drastic drastic change in its position in successive frames.  Our
+design is based on concentric circles as shown in Figure \ref{fig:fiducials}. 
+The design is based on the observation that motion blur from a quadcopter tends
+to be linear in nature.  As such, when our code is blurred, there is no blur in
+the direction perpendicular to the direction of motion.   This allows the
+signature of the fiducial to remain intact in any direction.  In addition, by
+using concentric rings, we can treat them as bits allowing us to encode us
+different fiducial identifers.  As far as we are aware, this is the first work
+to design a blur resistent marker.   Our experiments show that this design can
+significantly outperform existing codes in the face of motion blur.
+
+The remainder of this paper is organized as follows.   Section 2 gives an
+overview of related work, focused on fiducials as well the related problem of
+tracking.  Section X discusses the our design and detection algorithm, by first
+examining the performance of existing codes under blur. Section 3 shows several
+experiments using quadcopter imagery.  This is followed by a discussion and
+summary in Section 4 and 5 respectively.
 
 \begin{figure}
 \includegraphics[width=\linewidth]{teaser.pdf}
 \caption{Figure showing experimental setup and comparison of
 output of ALVAR\cite{alvar} (for detecting ARTag) versus output of our
 algorithm, in normal and blurred scene}
+\label{fig:teaser}
 \end{figure}
 
 \section{Related Work}
+
+[For related work, you need to give more context of how these are related to your work. 
+This is more of a list of papers and what they do, there relationship is not clear.]
+
 Our work is related to two areas: fiducial markers and
 object tracking. We will briefly discuss work done in both areas.
 \begin{figure}
@@ -120,7 +141,7 @@ object tracking. We will briefly discuss work done in both areas.
  \end{subfigure}
  \begin{subfigure}[b]{0.19\textwidth}
   \centering
-  \includegraphics[width=\linewidth]{pifiducial.png}
+  \includegraphics[width=\linewidth]{pifiducial.jpg}
   Pi-Tag\cite{Pitag13}
  \end{subfigure}
  \begin{subfigure}[b]{0.19\textwidth}
@@ -132,7 +153,7 @@ object tracking. We will briefly discuss work done in both areas.
  \label{fig:previous_work}
 \end{figure}
 
-The ARToolkit \cite{ARToolkit02} \cite{kato-artoolkit} is well known toolkit in
+The ARToolkit \cite{ARToolkit02}\cite{kato-artoolkit} is well known toolkit in
 Augmented Reality system, widely used to find pose of the object on which it is
 placed.  Fiala et al. \cite{Fiala05} developed a fiducial termed, ARTag, which is a
 bi-tonal system consisting of a square border and
@@ -144,9 +165,9 @@ Concentric rings are reportedly used first by Gatrell et al.\cite{concentric}
 for monocular pose estimation as well as object identification in space. Cho et al.
 \cite{Cho:2001}\cite{Cho97fastcolor} have used multi color rings in wide area
 tracking in large scale applications. In \cite{NaimarkF02}, Naimark et al.
-have developed ``Circular Data Matrix Fiducial System'', for wide area tracking.
+have developed ``Circular Data Matrix Fiducial System'', for wide area tracking. .... 
 
-Zhang el. al.\cite{Zhang:2002} and Claus et al. \cite{ClausF04} have done
+Zhang et al.\cite{Zhang:2002} and Claus et al. \cite{ClausF04} have done
 quite comprehensive comparative study of various fiducial marker systems with
 respect to processing time, recognition rate and accuracy with
 respect to viewing angle and distance.
@@ -181,13 +202,49 @@ criterion may not be satisfied.
 
 \section{Design of Fiducial}
 
-Before we detail the design of our fiducial, we examine the performance of two
-popular fidicuals, ARTags and PiTags, in the face of motion blur.
+We begin by first motivating the need for a new blur resistent fiducial by examining
+the performance of prior fiducials under motion blur.  After this, we detail
+our design as well as the detection algorithm used to find our marker in an image.
 
-We conducted a small experiment to test ARTag's resilience towards blur.
-We scaled down ARTag fiducial to size 150x150.  Then, we blurred ARTag
-at various orientations using different scales. Finally, we tried to detect
-ARTag in these blurred images using ALVAR library\cite{alvar}.
+\subsection{Examining Prior Fiducials Under Motion Blur}
+
+Before we detail the design of our fiducial, we examine the performance of two
+popular fiducials under motion blur that have different designs. Specifically,
+we examine ARTags\cite{Fiala05} and PiTags\cite{Pitag13}.
+
+We scaled down ARTag as well as PiTag fiducial to size 150x150.  Then, we
+blurred both fiducials at various orientations using different scales.
+Figure \ref{fig:artag_pitag} shows sample blurred AR Tag and Pi-Tag. Finally, we
+tried to detect ARTag using ALVAR library\cite{alvar} and Pi-Tag using\cite{ros_pitag}.
+
+\begin{figure}
+\centering
+\includegraphics[width=\linewidth]{artag_pitag.pdf}
+\caption{Blurred AR Tag and Pi--tag with various blur scales}
+\label{fig:artag_pitag}
+\end{figure}
+
+\begin{table}
+\centering
+\caption{Recognition rate of AR Tag and Pi-tag fiducial marker at various blur
+scales}
+\begin{tabularx}{0.75\textwidth}{|Y|Y|Y|}
+\cline{1-3}
+\multirow{2}{*}{Blur Scale} & \multicolumn{2}{c|}{Recognition Rate}
+\\\cline{2-3}
+ & AR Tag &	Pi-Tag \\ \cline{1-3}
+15 & 100 & 100 \\ \cline{1-3}
+30 & 0 & 100 \\  \cline{1-3}
+35 & 0 & 19 \\ \cline{1-3}
+50 & 0 & 0 \\ \cline{1-3}
+\end{tabularx}
+\label{tab:artag_pitag}
+\end{table}
+
+From Table \ref{tab:artag_pitag}, it can be clearly seen that performance of
+ARTag as well as Pi-Tag drastically degrade with increase in blur scale.
+
+\begin{comment}
 
 \begin{minipage}{\textwidth}
   \begin{minipage}[b]{0.49\textwidth}
@@ -232,6 +289,43 @@ scale is greater than 30, ARTag is not recognisable with horizontal blur
 orientation(blur angle near zero degrees) as well as vertial blur
 orientation(blur angle near 90 degrees).
 
+We have performed blur simulation experiment on Pi-tag \cite{Pitag13} to find
+how blur effects circular patterns. We tried to detect blurred Pi-tag using
+\cite{ros_pitag}.
+
+\begin{figure}
+\begin{subfigure}[b]{0.3\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{detect_noblur.jpg}
+  No Blur
+ \end{subfigure}
+ \begin{subfigure}[b]{0.3\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{detect_blur15.jpg}
+  Blur Scale = 15
+ \end{subfigure}
+ \begin{subfigure}[b]{0.3\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{nodetect_blur20.jpg}
+  Blur Scale = 20
+ \end{subfigure}
+ \caption{Effect of blur on detection of Pi-Tag}
+ \label{fig:pitag_blur}
+\end{figure}
+
+From Figure \ref{fig:pitag_blur}, it can be seen that, Pi-tag detection
+fails when blur scale is more than 15. The reason behind this is, Pi-tag
+detection is based on Ellipse detection which will fail in the presence of
+significant amount of blur. So, ellipse detection may not be the efficient way
+to detect circular patterns under blur.
+\end{comment}
+We have designed a fiducial that may be thought of as a binary code.  It
+contains concentric white rings of equal widths on a black background with a
+blurred border. The outermost and innermost rings represent the start and end
+of the code and is embedded in the fiducial; these are not considered part of
+the code itself. The binary code is represented by the presence (or absence) of
+rings between ``marker'' rings.
+
 \begin{figure}
 \centering
   \includegraphics[width=.22\linewidth]{newconcentric_00.pdf}
@@ -243,63 +337,14 @@ orientation(blur angle near 90 degrees).
   \label{fig:fiducials}
 \end{figure}
 
-Inspired from Circular Data Matrix\cite{NaimarkF02} we have designed a fiducial
-that may be thought of as a binary code.  It contains concentric white rings of
-equal widths on a black background with a blurred border. The outermost and
-innermost rings represent the start and end of the code and is embedded in the
-fiducial; these are not considered part of the code itself. The binary code is
-represented by the presence (or absence) of rings between ``marker'' rings.
-
 Depending on which ring is present or absent, the resulting binary code will
 change. The number of different patterns depends on the number of bits in the
 binary code. For example, if the binary code has three bits, there will be a
 maximum of three rings between``marker'' rings and we end up with eight
-different patterns. Fig. \ref{fig:fiducials} shows two bit binary coded
+different patterns. Figure \ref{fig:fiducials} shows two bit binary coded
 fiducials.
 
-\section{Fiducial Detection Algorithm}
-
-We have performed blur simulation experiment on Pi-tag \cite{Pitag13} to find
-how blur effects circular patterns. We tried to detect blurred Pi-tag using
-\cite{ros_pitag}.
-
-\begin{figure}
-\begin{subfigure}[b]{0.3\textwidth}
-  \centering
-  \includegraphics[width=\linewidth]{detect_noblur.jpg}
-  No Blur  
- \end{subfigure}
- \begin{subfigure}[b]{0.3\textwidth}
-  \centering
-  \includegraphics[width=\linewidth]{detect_blur15.jpg}
-  Blur Scale = 15  
- \end{subfigure}
- \begin{subfigure}[b]{0.3\textwidth}
-  \centering
-  \includegraphics[width=\linewidth]{nodetect_blur20.jpg}
-  Blur Scale = 20  
- \end{subfigure}
- \caption{Effect of blur on detection of Pi-Tag}
- \label{fig:pitag_blur}
-\end{figure}
-
-From Fig. \ref{fig:pitag_blur}, it can be seen that, Pi-tag detection
-fails when blur scale is more than 15. The reason behind this is, Pi-tag
-detection is based on Ellipse detection which will fail in the presence of
-significant amount of blur. So, ellipse detection may not be the efficient way
-to detect circular patterns under blur.
-
-\begin{figure}
-\includegraphics[width=\linewidth]{overall_flow.pdf}
-\caption{Overall Workflow}
-\end{figure}
-Our fiducial detection strategy is different from \cite{NaimarkF02,Pitag13} and works
-under significant amount of blur.   In particular, we assume that scene motion 
-blur be modelled locally as a linear motion blur~\cite{}.  Under this assumption,
-scene content perpendicular to the blur direction is unaffected by the blur.  Because
-of our circular design, this means the perpendicular direction can be observed as a 
-unblurred linear pattern.  Figure \ref{fig:blur_direction} shows an example with
-various motion directions.
+\subsection{Fiducial Detection Algorithm}
 
 \begin{figure}
 \centering
@@ -307,6 +352,14 @@ various motion directions.
 \caption{Relation of blur direction and unblurred linear pattern}
 \label{fig:blur_direction}
 \end{figure}
+
+Our fiducial detection strategy is different from \cite{NaimarkF02,Pitag13} and works
+under significant amount of blur.   In particular, we assume that scene motion
+blur be modelled locally as a linear motion blur \cite{Moshe:2003,Moshe:2004}. 
+Under this assumption, scene content perpendicular to the blur direction is 
+unaffected by the blur.  Because of our circular design, this means the
+perpendicular direction can be observed as a unblurred linear pattern.  Figure
+\ref{fig:blur_direction} shows an example with various motion directions.
 
 Overall flow of fiducial detection algorithm can be summarised as follows:
 
@@ -324,6 +377,15 @@ Overall flow of fiducial detection algorithm can be summarised as follows:
   \end{itemize}
 \end{itemize}
 
+Figure \ref{fig:overall_flow} shows the process involved in fiducial detection
+process.
+
+\begin{figure}
+\includegraphics[width=\linewidth]{overall_flow.pdf}
+\caption{Overall Workflow}
+\label{fig:overall_flow}
+\end{figure}
+
 \textbf{Gabor Filter}: A 2D Gabor filter is a Gaussian kernel function modulated
 by a sinusoidal plane wave. It is used to find high gradient patches from the
 image. In our case, it will detect blur invariant sections of the fiducials. We
@@ -332,13 +394,14 @@ have applied Gabor filter for eight different orientations ($\theta = 0, 45,
 creating each Gabor kernel: $\lambda = 8$, $\gamma = 0.5$, $\sigma =
 0.56\lambda$, $\psi = 0 \text{(for real part)}, \pi/2 \text{(for imaginary
 part)}$.
-Then L2 norm of outputs along all orientations is calculated and finally, L2
+Then L2 norm of outputs along all orientations is calculated and finally L2
 normed image is binarized.
 
 \begin{figure}
 \centering
-  \includegraphics[width=\linewidth]{training_data.pdf}  
+  \includegraphics[width=\linewidth]{training_data.pdf}
   \caption{Training data for the fiducial pattern with binary code ``01''}
+  \label{fig:training_data}
 \end{figure}
 
 \textbf{Clustering}: Connected components are found from the Gabor output.
@@ -353,8 +416,9 @@ number of rings.
 \textbf{Classification}: Each synthetic fiducial pattern is blurred along 36
 orientations (0, 10, 20, \ldots , 350) and intensity profile along first
 principal component from every output is taken as training data for that
-fiducial pattern. Test pattern is matched against training data using 
-K-Nearest Neighbor Classifier (K=5) to output class label.
+fiducial pattern. Process of creation of training data for fiducial with
+code ``01'' is depicted in Figure \ref{fig:training_data}. Test pattern is matched
+against training data using K-Nearest Neighbor Classifier (K=5) to output class label.
 
 To increase classification accuracy, training data for patterns having same
 number of rings is grouped together; e.g., in two bit binary coded fiducial,
@@ -368,11 +432,14 @@ rings or maximum possible rings in the test pattern, there will be no need to do
 further classification.
 
 \section{Experimental Validation}
+We have implemented our algorithm in C++ using OpenCV library. Our code was run
+on a PC with Intel Core i7 processor(@3.4GHz) and 4GB RAM.
 
 Our system has been tested on the image sequences captured from AR Drone
 quadcopter. Each image sequence contains frames containing different fiducial
-pattern. Sample output for each fiducial pattern is shown in Fig.
-\ref{fig:output0} -- Fig. \ref{fig:output3}.
+pattern. Sample output for each fiducial pattern is shown in Figure
+\ref{fig:output0} -- Figure \ref{fig:output3}. Our detection process takes
+around 0.3 seconds and can handle three to four frames per second.
 
 \begin{figure}
 \begin{subfigure}{0.5\textwidth}
@@ -404,7 +471,7 @@ pattern. Sample output for each fiducial pattern is shown in Fig.
 
 Our system has also been tested on images containing multiple fiducial patterns
 in the same frame. Our algorithm successfully detected all fiducial patterns as
-well as correctly classified them as shown in Fig. \ref{fig:output_all}
+well as correctly classified them as shown in Figure \ref{fig:output_all}.
 \begin{figure}
 \centering
   \includegraphics[width=.8\linewidth]{output_all_2.jpg}
@@ -420,7 +487,7 @@ First, we have repeated blur simulation experiment on our fiducials too, i.e.,
 we have downsized our fiducial to size 150x150 and blurred it along various
 orientations with different blur scales. Then, we tried to detect the patterns
 using algorithm presented in earlier section. The comparison of recongition
-rate is shown in Fig. \label{fig:recognition_rate}. 
+rate is shown in Figure \ref{fig:recognition_rate}.
 
 \begin{figure}
 \centering
@@ -451,14 +518,14 @@ data captured through AR Drone}
 \label{tab:recongition_accuracy}
 \end{table}
 
-\subsubsection{Comparison with BLUT} 
+\subsubsection{Comparison with BLUT}
 We have used sample image sequence to test the performance of BLUT\cite{Wu:2011}
-and compare it with out result on the same image sequence. From Fig. \ref{fig:BLUT_output},
+and compare it with out result on the same image sequence. From Figure \ref{fig:BLUT_output},
 it can be inferred that BLUT is able to track the fiducial when the position of
 fiducial doesnot change too much in successive frames. Also, it can be seen
 that, once BLUT looses the track of the fiducial, it is not able to recover from
 that. But, our algorithm is able to track the fiducial irrespecive of the change
-in the position of the fiducial in the image as shown in Fig.
+in the position of the fiducial in the image as shown in Figure
 \ref{fig:our_output}.
 
 \begin{figure}
@@ -498,17 +565,44 @@ in the position of the fiducial in the image as shown in Fig.
 \includegraphics[width=\linewidth]{output15.jpg}
 \end{subfigure}
 \caption{Output of our algorithm on image sequence used in
-Fig. \ref{fig:BLUT_output}}
+Figure \ref{fig:BLUT_output}}
 \label{fig:our_output}
 \end{figure}
 
 \section{Discussion}
-\begin{itemize}
-\item Processing Time
-\item False Positives and False Negatives
-\item Pose Estimation
-\end{itemize}
+
+\textbf{Processing Time} :-  Currently our processing time (0.3 seconds per
+frame) makes it difficult to do the fiducial detection in real-time. When we have
+done the code profiling, we found that Gabor filter takes most of the time (0.03
+-- 0.04 seconds perorientation). As we are applying Gabor filter along eight
+orientations, we should think of some optimized way to do filtering.
+Alternatively, some replacement for Gabor filter needs to be find out.  
+
+\textbf{False Negatives} :- We found that sometime our detection algorithm is
+failed do recognize our fiducial with binary code ``0'' when there is large
+amount of blur. This is the reason behing low recognition rate of ``00''
+coded fiducial compared to that of our other fiducial patterns. When we
+investigated the problem, we found that, if there is too much blur, the
+innermost ring is not detected along the direction perpandicular to blur
+direction. This problem can be resolved by increasing radius of innermost ring.
+
+\textbf{Pose Estimation} :- Currently, we are not finding the pose from the
+fiducial marker. But, if we put multiple markers (atleast four) in the same
+scene, we may be able to find the pose. The current resolution of onboard camera
+will be main hurdle to clear before we can effectively use multiple markers in
+each scene.
+
+\textbf{Number of Fiducials} :- Currently, compared to AR Tag fiducial markers,
+we are able to generate less number of fiducials. Many applications in
+robotics (e.g. qudcopter navigation) may not require large number of fiducial
+markers as AR Tag. Most of the time, it is sufficient to have 4-6
+different fiducial patterns. Still, we may be able to generate more number of
+fiducials by using color background insted of black. E.g., if we just use Red,
+Green and Blue as background color, number of fiducials will be increased by
+factor of three.
+
 \section{Conclusion and Future Work}
+
 
 \bibliographystyle{splncs}
 \bibliography{egbib}
