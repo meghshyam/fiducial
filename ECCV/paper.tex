@@ -78,7 +78,7 @@ These typically take the form of binary codes arranged into rectangular grids (\
 or other geometric features arranged in unique spatial patterns
 (\cite{NaimarkF02}\cite{Pitag13}\cite{runetag11}).
 Figure \ref{fig:teaser} shows an example of the popular ARTag\cite{Fiala05} as
-seen from a quad-copter.  One p roblem, however, is that low-cost quadcopters
+seen from a quad-copter.  One problem, however, is that low-cost quadcopters
 often exhibit very quick and erratic motion.  These fast physical movements
 results in motion blur in the quadcopters onboard camera.  Such motion blur has an adverse effect the
 reconition of fiducial  markers.  This can be seen in Figure \ref{fig:teaser}(b)
@@ -103,10 +103,10 @@ significantly outperform existing codes in the face of motion blur.
 
 The remainder of this paper is organized as follows.   Section 2 gives an
 overview of related work, focused on fiducials as well the related problem of
-tracking.  Section X discusses the our design and detection algorithm, by first
-examining the performance of existing codes under blur. Section 3 shows several
+tracking.  Section 3 discusses the our design and detection algorithm, by first
+examining the performance of existing codes under blur. Section 4 shows several
 experiments using quadcopter imagery.  This is followed by a discussion and
-summary in Section 4 and 5 respectively.
+summary in Section 5 and 6 respectively.
 
 \begin{figure}
 \includegraphics[width=\linewidth]{teaser.pdf}
@@ -118,11 +118,12 @@ algorithm, in normal and blurred scene}
 
 \section{Related Work}
 
-[For related work, you need to give more context of how these are related to your work. 
-This is more of a list of papers and what they do, there relationship is not clear.]
-
 Our work is related to two areas: fiducial markers and
 object tracking. We will briefly discuss work done in both areas.
+
+\textbf{Fiducials} :- Some of fiducial designs are shown in Figure
+\ref{fig:previous_work}.
+
 \begin{figure}
  \begin{subfigure}[b]{0.19\textwidth}
   \centering
@@ -153,47 +154,71 @@ object tracking. We will briefly discuss work done in both areas.
  \label{fig:previous_work}
 \end{figure}
 
-The ARToolkit \cite{ARToolkit02}\cite{kato-artoolkit} is well known toolkit in
-Augmented Reality system, widely used to find pose of the object on which it is
-placed.  Fiala et al. \cite{Fiala05} developed a fiducial termed, ARTag, which is a
-bi-tonal system consisting of a square border and
-an interior region filled with a 6x6 grid of black or white cells. It proved to
-be more efficient than \cite{ARToolkit02} in terms of marker recognition rate
-as well as the number of different patterns which can be created.
+Intitially there were attempts to design a fiducial embeded with two dimensional
+barcode inside a rectangular grid. One of the examples of such fiducial is,
+ARToolkit\cite{ARToolkit02}, well known toolkit in Augmented Reality(AR) system. 
+Kato et al.\cite{kato-artoolkit} have deomstrated the use of ARToolkit to find
+the pose in cideo conferencing system. Many AR applications used ARToolkit
+due to its simplicity and efficiency. 
+
+Fiala et al. \cite{Fiala05} developed a fiducial termed, ARTag, which is a
+bi-tonal system consisting of a square border and an interior region filled
+with a 6x6 grid of black or white cells. The improvement in ARTag compared
+ARToolkit was detection of coreners instead of detection of lines to find
+possible pattern. It proved to be more efficient than \cite{ARToolkit02} in
+terms of marker recognition rate as well as the number of different patterns
+which can be created. But, drawback of ARTag is, under significant amount of
+motion blur, corners can not be detected, resulting in non-recognition of tag.
+
+There were also attempts to use circular patterns instead of rectangular, as
+the projective transfomration of circles, i.e. conics, are invariant with
+resepctive to point of view of camera\cite{runetag11}. Also, such patterns are
+mostly distingushable from background and generally can not be missed.
 
 Concentric rings are reportedly used first by Gatrell et al.\cite{concentric}
 for monocular pose estimation as well as object identification in space. Cho et al.
-\cite{Cho:2001}\cite{Cho97fastcolor} have used multi color rings in wide area
-tracking in large scale applications. In \cite{NaimarkF02}, Naimark et al.
-have developed ``Circular Data Matrix Fiducial System'', for wide area tracking. .... 
+\cite{Cho:2001}\cite{Cho97fastcolor} have used multi color rings instead of
+black and white rings\cite{concentric} to increase possible number of fiducials.
+These multicolor rings are used in wide area tracking in large scale
+applications.
+
+Naimark et al. \cite{NaimarkF02} have combined concentric rings and 2D bar code
+in their fiducial named, Circular Data Matrix. It was beneficial in terms of
+easy detection of fiducial as well as more number of fiducial patterns.
+
+All of these fiducials are not recognizable under occlusion.
+Bergamasco et al. \cite{runetag11} have divided fiducial into number of
+circular dots, and arranged them in circular fashion, named as RUNE-Tag.
+RUNE-tags are reportedly detectable even if 50\% of fiducial area is occluded.
+Bergamasco et al. have devloped another fiducial, named as Pi-Tag
+\cite{Pitag13}, using cross-ratio concept. As cross-ratio is projective
+invariant, the detection of Pi-tag is easier than other tags. Also, compared
+to RUNE-tag, it uses remarkably less number of circular dots (12 dots instead of
+minimum of 43 dots), still reconisable under occlusion.
+
+But again problem with circular fiducials is, it is very difficult to detect
+ellipses accurately under significant motion blur. So, under blur, recognition
+rate of these fiducials is very low.
 
 Zhang et al.\cite{Zhang:2002} and Claus et al. \cite{ClausF04} have done
 quite comprehensive comparative study of various fiducial marker systems with
 respect to processing time, recognition rate and accuracy with
 respect to viewing angle and distance.
 
-Bergamasco et al. \cite{runetag11} developed RUNE-Tag, fiducial marker
-system which works under large amount of occlusion. Bergamasco et al. also
-designed Pi-Tag \cite{Pitag13}, marker design based on projective
-invariants.
-
-The main hurdle in detection of current fiducials is, the detecton of features:
-lines in \cite{ARToolkit02}, corners in \cite{Fiala05} while ellipses in
-\cite{Cho:2001}, \cite{Cho97fastcolor}, \cite{runetag11} and \cite{Pitag13}.
-Such features are very difficult to detect accurately under significant motion
-blur. So, under blur, recognition rate of these fiducials is very low.
-
+\textbf{Tracking}:-
 Fiducial detection in video may be considered as tracking problem where tracked
 object is fiducial itself. Visual tracking plays an important role in
 surveillance, robotics, human computer interaction, and medical
 imaging\cite{Yilmaz:2006}. Yilmaz et al.\cite{Yilmaz:2006} have done survey of
-various tracking methods. Most tracking methods
-( \cite{Ross:2008} \cite{Wu:2009} \cite{Perez02} \cite{Mei:2009} ) assume image
-sequence to be blur free. But in reality, motion blur is inherent part of most
-of the videos. Wu et al.\cite{Wu:2011} have developed BLUr-driven Tracker (BLUT)
-framework for tracking motion-blurred targets. BLUT is based on the observation
-that although motion blurs degrade the visual features of the target, they, at
-thde same time, provide useful cues about the movements to help tracking.
+various tracking methods. 
+
+Most tracking methods( \cite{Ross:2008} \cite{Wu:2009} \cite{Perez02}
+\cite{Mei:2009} ) assume image sequence to be blur free. But in reality, motion
+blur is inherent part of most of the videos. Wu et al.\cite{Wu:2011} have
+developed BLUr-driven Tracker (BLUT) framework for tracking motion-blurred
+targets. BLUT is based on the observation that although motion blurs degrade
+the visual features of the target, they, at thde same time, provide useful cues
+about the movements to help tracking.
 
 BLUT framework successfully tracks blurred target when there is uniform motion
 and the position of tracked object does not change drastically in successive
@@ -498,11 +523,11 @@ blur simulated data at various blur scales}
 \end{figure}
 
 Later, we recorded the real data using AR Drone quadcopter. In our experimental
-setup, we have kept our fiducial alog with two AR Tags, to compare the
+setup, we have kept our fiducial along with two AR Tags, to compare the
 resilience of blur by each fiducial type. We have used ar\_track\_alvar, ROS
 Wrapper for ALVAR libray \cite{ros_alvar}, to detect AR Tags from the stream
-captured through quadcopter. The comparison of recognition rate shown in Table
-\ref{tab:recongition_accuracy}. Classification accuracy of all fiducials(ARTag
+captured through quadcopter. The comparison of recognition rate is shown in
+Table \ref{tab:recongition_accuracy}. Classification accuracy of all fiducials(ARTag
 as well as ours) is almost 100\%.
 
 \begin{table}
@@ -520,8 +545,8 @@ data captured through AR Drone}
 
 \subsubsection{Comparison with BLUT}
 We have used sample image sequence to test the performance of BLUT\cite{Wu:2011}
-and compare it with out result on the same image sequence. From Figure \ref{fig:BLUT_output},
-it can be inferred that BLUT is able to track the fiducial when the position of
+and compare it with our result on the same image sequence. From Figure
+\ref{fig:BLUT_output}, it can be inferred that BLUT is able to track the fiducial when the position of
 fiducial doesnot change too much in successive frames. Also, it can be seen
 that, once BLUT looses the track of the fiducial, it is not able to recover from
 that. But, our algorithm is able to track the fiducial irrespecive of the change
@@ -574,17 +599,18 @@ Figure \ref{fig:BLUT_output}}
 \textbf{Processing Time} :-  Currently our processing time (0.3 seconds per
 frame) makes it difficult to do the fiducial detection in real-time. When we have
 done the code profiling, we found that Gabor filter takes most of the time (0.03
--- 0.04 seconds perorientation). As we are applying Gabor filter along eight
+-- 0.04 seconds per orientation). As we are applying Gabor filter along eight
 orientations, we should think of some optimized way to do filtering.
 Alternatively, some replacement for Gabor filter needs to be find out.  
 
 \textbf{False Negatives} :- We found that sometime our detection algorithm is
-failed do recognize our fiducial with binary code ``0'' when there is large
-amount of blur. This is the reason behing low recognition rate of ``00''
+failed do recognize our fiducial with binary code ``00'' when there is large
+amount of blur. This is the reason behing lower recognition rate of ``00''
 coded fiducial compared to that of our other fiducial patterns. When we
-investigated the problem, we found that, if there is too much blur, the
-innermost ring is not detected along the direction perpandicular to blur
-direction. This problem can be resolved by increasing radius of innermost ring.
+investigated the problem, we found that, if there is too much blur, in Gabor
+output, the innermost ring is unable to give any response along the direction
+perpandicular to blur direction. This problem can be resolved by increasing
+radius of innermost ring, reducing effect of blur on the innermost ring.
 
 \textbf{Pose Estimation} :- Currently, we are not finding the pose from the
 fiducial marker. But, if we put multiple markers (atleast four) in the same
