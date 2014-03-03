@@ -68,7 +68,7 @@ vision based modules that uses visual cues in the real world\cite{Davison:2007}.
 However, to evaluate the effectiveness of navigation methods, artificial
 fiducial markers are commonly introduces into the environment to provide
 additional information that often serves for ground-truth
-measurements(e.g.\cite{Bosnak:2012}\cite{Lim09})
+measurements(e.g.\cite{Bosnak:2012}\cite{Lim09}\cite{Klopschitz:2007})
 
 In order to be effective, fiducial markers (or simply called, fiducials) need
 to be easily detected in the scene.  There are various existing commonly
@@ -81,12 +81,12 @@ Figure \ref{fig:teaser} shows an example of the popular ARTag\cite{Fiala05} as
 seen from a quad-copter.  One problem, however, is that low-cost quadcopters
 often exhibit very quick and erratic motion.  These fast physical movements
 results in motion blur in the quadcopters onboard camera.  Such motion blur has an adverse effect the
-reconition of fiducial  markers.  This can be seen in Figure \ref{fig:teaser}(b)
-where the ARTag cannot be recongized. This is not too surprising as most
-fidicuals are not explicitly designed to handle motion blur.  Compounding this
+recognition of fiducial  markers.  This can be seen in Figure
+\ref{fig:teaser}(b) where the ARTag cannot be recognized. This is not too surprising as most
+fiducials are not explicitly designed to handle motion blur.  Compounding this
 problem is the common problem of dropped video frames from the quadcopters
 wireless communication module.   This means that no only is blurring
-introduced, but there may be large discountinues in the patterns position due
+introduced, but there may be large discontinuities in the patterns position due
 to missing video frames that makes tracking challenging.
 
 To address this problem, propose a fiducial design that is robust to motion
@@ -97,8 +97,8 @@ to be linear in nature.  As such, when our code is blurred, there is no blur in
 the direction perpendicular to the direction of motion.   This allows the
 signature of the fiducial to remain intact in any direction.  In addition, by
 using concentric rings, we can treat them as bits allowing us to encode us
-different fiducial identifers.  As far as we are aware, this is the first work
-to design a blur resistent marker.   Our experiments show that this design can
+different fiducial identifiers.  As far as we are aware, this is the first work
+to design a blur resistant marker.   Our experiments show that this design can
 significantly outperform existing codes in the face of motion blur.
 
 The remainder of this paper is organized as follows.   Section 2 gives an
@@ -154,30 +154,30 @@ object tracking. We will briefly discuss work done in both areas.
  \label{fig:previous_work}
 \end{figure}
 
-Intitially there were attempts to design a fiducial embeded with two dimensional
-barcode inside a rectangular grid. One of the examples of such fiducial is,
+Initially there were attempts to design a fiducial embedded with two
+dimensional barcode inside a rectangular grid. One of the examples of such fiducial is,
 ARToolkit\cite{ARToolkit02}, well known toolkit in Augmented Reality(AR) system. 
-Kato et al.\cite{kato-artoolkit} have deomstrated the use of ARToolkit to find
-the pose in cideo conferencing system. Many AR applications used ARToolkit
+Kato et al.\cite{kato-artoolkit} have demonstrated the use of ARToolkit to find
+the pose in video conferencing system. Many AR applications used ARToolkit
 due to its simplicity and efficiency. 
 
 Fiala et al. \cite{Fiala05} developed a fiducial termed, ARTag, which is a
 bi-tonal system consisting of a square border and an interior region filled
-with a 6x6 grid of black or white cells. The improvement in ARTag compared
-ARToolkit was detection of coreners instead of detection of lines to find
+with a 6x6 grid of black or white cells. The improvement in ARTag compared to
+ARToolkit was detection of corners instead of detection of lines to find
 possible pattern. It proved to be more efficient than \cite{ARToolkit02} in
 terms of marker recognition rate as well as the number of different patterns
 which can be created. But, drawback of ARTag is, under significant amount of
 motion blur, corners can not be detected, resulting in non-recognition of tag.
 
 There were also attempts to use circular patterns instead of rectangular, as
-the projective transfomration of circles, i.e. conics, are invariant with
-resepctive to point of view of camera\cite{runetag11}. Also, such patterns are
-mostly distingushable from background and generally can not be missed.
+the projective transformation of circles, i.e., conics, are invariant with
+respective to point of view of camera\cite{runetag11}. Also, such patterns are
+mostly distinguishable from background and generally can not be missed.
 
 Concentric rings are reportedly used first by Gatrell et al.\cite{concentric}
 for monocular pose estimation as well as object identification in space. Cho et al.
-\cite{Cho:2001}\cite{Cho97fastcolor} have used multi color rings instead of
+\cite{Cho:2001}\cite{Cho97fastcolor} have used multicolor rings instead of
 black and white rings\cite{concentric} to increase possible number of fiducials.
 These multicolor rings are used in wide area tracking in large scale
 applications.
@@ -190,11 +190,11 @@ All of these fiducials are not recognizable under occlusion.
 Bergamasco et al. \cite{runetag11} have divided fiducial into number of
 circular dots, and arranged them in circular fashion, named as RUNE-Tag.
 RUNE-tags are reportedly detectable even if 50\% of fiducial area is occluded.
-Bergamasco et al. have devloped another fiducial, named as Pi-Tag
+Bergamasco et al. have developed another fiducial, named as Pi-Tag
 \cite{Pitag13}, using cross-ratio concept. As cross-ratio is projective
 invariant, the detection of Pi-tag is easier than other tags. Also, compared
 to RUNE-tag, it uses remarkably less number of circular dots (12 dots instead of
-minimum of 43 dots), still reconisable under occlusion.
+minimum of 43 dots), still recognisable under occlusion.
 
 But again problem with circular fiducials is, it is very difficult to detect
 ellipses accurately under significant motion blur. So, under blur, recognition
@@ -217,17 +217,17 @@ Most tracking methods( \cite{Ross:2008} \cite{Wu:2009} \cite{Perez02}
 blur is inherent part of most of the videos. Wu et al.\cite{Wu:2011} have
 developed BLUr-driven Tracker (BLUT) framework for tracking motion-blurred
 targets. BLUT is based on the observation that although motion blurs degrade
-the visual features of the target, they, at thde same time, provide useful cues
+the visual features of the target, they at the same time, provide useful cues
 about the movements to help tracking.
 
 BLUT framework successfully tracks blurred target when there is uniform motion
 and the position of tracked object does not change drastically in successive
-frames. But in our case, due to frequntly dropping of intermediate frame, this
+frames. But in our case, due to frequently dropping of intermediate frame, this
 criterion may not be satisfied.
 
 \section{Design of Fiducial}
 
-We begin by first motivating the need for a new blur resistent fiducial by examining
+We begin by first motivating the need for a new blur resistant fiducial by examining
 the performance of prior fiducials under motion blur.  After this, we detail
 our design as well as the detection algorithm used to find our marker in an image.
 
@@ -311,7 +311,7 @@ at certain blur orientations, recognition of ARTag fails. Table shows the range
 of blur angles for which we are able to recognise the ARTag at different blur
 scales. From Table \ref{tab:artag_blurangle}, it can be seen that, when blur
 scale is greater than 30, ARTag is not recognisable with horizontal blur
-orientation(blur angle near zero degrees) as well as vertial blur
+orientation(blur angle near zero degrees) as well as vertical blur
 orientation(blur angle near 90 degrees).
 
 We have performed blur simulation experiment on Pi-tag \cite{Pitag13} to find
@@ -457,8 +457,9 @@ rings or maximum possible rings in the test pattern, there will be no need to do
 further classification.
 
 \section{Experimental Validation}
-We have implemented our algorithm in C++ using OpenCV library. Our code was run
-on a PC with Intel Core i7 processor(@3.4GHz) and 4GB RAM.
+We have implemented\footnote{Code as well as experimental data will be made
+online soon} our algorithm in C++ using OpenCV library.
+Our code was run on a PC with Intel Core i7 processor(@3.4GHz) and 4GB RAM.
 
 Our system has been tested on the image sequences captured from AR Drone
 quadcopter. Each image sequence contains frames containing different fiducial
@@ -511,7 +512,7 @@ compare our results with Blur driven tracker(BLUT)\cite{Wu:2011}.
 First, we have repeated blur simulation experiment on our fiducials too, i.e.,
 we have downsized our fiducial to size 150x150 and blurred it along various
 orientations with different blur scales. Then, we tried to detect the patterns
-using algorithm presented in earlier section. The comparison of recongition
+using algorithm presented in earlier section. The comparison of recognition
 rate is shown in Figure \ref{fig:recognition_rate}.
 
 \begin{figure}
@@ -525,7 +526,7 @@ blur simulated data at various blur scales}
 Later, we recorded the real data using AR Drone quadcopter. In our experimental
 setup, we have kept our fiducial along with two AR Tags, to compare the
 resilience of blur by each fiducial type. We have used ar\_track\_alvar, ROS
-Wrapper for ALVAR libray \cite{ros_alvar}, to detect AR Tags from the stream
+Wrapper for ALVAR library \cite{ros_alvar}, to detect AR Tags from the stream
 captured through quadcopter. The comparison of recognition rate is shown in
 Table \ref{tab:recongition_accuracy}. Classification accuracy of all fiducials(ARTag
 as well as ours) is almost 100\%.
@@ -547,10 +548,10 @@ data captured through AR Drone}
 We have used sample image sequence to test the performance of BLUT\cite{Wu:2011}
 and compare it with our result on the same image sequence. From Figure
 \ref{fig:BLUT_output}, it can be inferred that BLUT is able to track the fiducial when the position of
-fiducial doesnot change too much in successive frames. Also, it can be seen
+fiducial does not change too much in successive frames. Also, it can be seen
 that, once BLUT looses the track of the fiducial, it is not able to recover from
-that. But, our algorithm is able to track the fiducial irrespecive of the change
-in the position of the fiducial in the image as shown in Figure
+that. But, our algorithm is able to track the fiducial irrespective of the
+change in the position of the fiducial in the image as shown in Figure
 \ref{fig:our_output}.
 
 \begin{figure}
@@ -605,30 +606,41 @@ Alternatively, some replacement for Gabor filter needs to be find out.
 
 \textbf{False Negatives} :- We found that sometime our detection algorithm is
 failed do recognize our fiducial with binary code ``00'' when there is large
-amount of blur. This is the reason behing lower recognition rate of ``00''
+amount of blur. This is the reason behind lower recognition rate of ``00''
 coded fiducial compared to that of our other fiducial patterns. When we
 investigated the problem, we found that, if there is too much blur, in Gabor
 output, the innermost ring is unable to give any response along the direction
-perpandicular to blur direction. This problem can be resolved by increasing
+perpendicular to blur direction. This problem can be resolved by increasing
 radius of innermost ring, reducing effect of blur on the innermost ring.
 
 \textbf{Pose Estimation} :- Currently, we are not finding the pose from the
-fiducial marker. But, if we put multiple markers (atleast four) in the same
+fiducial marker. But, if we put multiple markers (at least four) in the same
 scene, we may be able to find the pose. The current resolution of onboard camera
 will be main hurdle to clear before we can effectively use multiple markers in
 each scene.
 
 \textbf{Number of Fiducials} :- Currently, compared to AR Tag fiducial markers,
 we are able to generate less number of fiducials. Many applications in
-robotics (e.g. qudcopter navigation) may not require large number of fiducial
+robotics (e.g. quadcopter navigation) may not require large number of fiducial
 markers as AR Tag. Most of the time, it is sufficient to have 4-6
 different fiducial patterns. Still, we may be able to generate more number of
-fiducials by using color background insted of black. E.g., if we just use Red,
+fiducials by using color background instead of black. E.g., if we just use Red,
 Green and Blue as background color, number of fiducials will be increased by
 factor of three.
 
 \section{Conclusion and Future Work}
-
+Quadcopters are subject to quick and unstable motions that can cause significant
+motion blur in the captured images. It severely affects the detection rate of
+existing fiducial markers. We proposed the design of a fiducial that is robust
+to motion blur. Our design of contrasting concentric rings is based on the the
+observation that the direction perpendicular to the motion blur direction will
+be unaffected by the blur and therefore still be recognizable. We have shown
+through experimental validation that our fiducial will work under significant
+amount of motion blur. When compared to popular fiducials, our fiducial can
+withstand around twice the amount of blur.  Though, currently we are not able to
+find the pose using single pattern, we may be able to overcome this
+shortcoming by using multiple markers in single scene. Also, through faster
+implementation of Gabor filter, the fiducial detection can be done in realtime.
 
 \bibliographystyle{splncs}
 \bibliography{egbib}
