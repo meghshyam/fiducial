@@ -51,11 +51,12 @@ positions in the scene to be detected from the quadcopter's camera. Quadcopters,
 however, are subject to quick and unstable motions that can cause significant motion
 blur that severely affects the detection rate of existing fiducial markers.
 This problem motivated us to design a fiducial that is robust to motion blur.
-Our proposed fiducial design uses concentric circles with the observation that the direction perpendicular to the motion blur direction will be unaffected by the blur.  As a result,
-the fiducial code along this direction is recognizable.  The circular design allows this to
-  work for all motion blur directions.  We detail the design and
-detection algorithm for our fiducial and show that our marker can significantly
-outperform existing fiducial markers in scenes captured with a quadcopter.
+Our proposed fiducial design uses concentric circles with the observation that
+the direction perpendicular to the motion blur direction will be unaffected by
+the blur.  As a result, the fiducial code along this direction is recognizable.
+The circular design allows this to work for all motion blur directions.  We
+detail the design and detection algorithm for our fiducial and show that our
+marker can significantly outperform existing fiducial markers in scenes captured with a quadcopter.
 \keywords{Fiducials, tracking, recognition under blur}
 \end{abstract}
 
@@ -78,15 +79,19 @@ or other geometric features arranged in predefined spatial patterns
 (\cite{NaimarkF02,Pitag13,runetag11}).
 Figure \ref{fig:teaser}-top shows an example of the popular ARTag\cite{Fiala05} as
 seen from a quadcopter.  A problem for existing fiducials is  that low-cost quadcopters
-oftenexhibit very quick and erratic physical movements that
-results in motion blur in the quadcopters onboard camera.  This motion blur has an adverse effect the  recognition of fiducial  markers.  This can be seen in Figure
-\ref{fig:teaser}(top) where the ARTag cannot be recognized due to motion blur. This is not too surprising as most  existing fiducials are not explicitly designed to handle motion blur.
+often exhibit very quick and erratic physical movements that
+results in motion blur in the quadcopters onboard camera.  This motion blur has
+an adverse effect the  recognition of fiducial  markers.  This can be seen in
+Figure \ref{fig:teaser}(top) where the ARTag cannot be recognized due to motion
+blur. This is not too surprising as most  existing fiducials are not explicitly
+designed to handle motion blur.
 
 Compounding this problem is the additional issue of dropped video frames from the quadcopters
 wireless communication module.   This means that not only is blurring
 introduced, but there may be large discontinuities in the patterns position due
-to missing video frames.  As we will show in Section 4, this latter problem makes it challenging to apply tracking algorithms that can exploit temporal coherence for determining
-the fiducial positions.
+to missing video frames.  As we will show in Section 4, this latter problem
+makes it challenging to apply tracking algorithms that can exploit temporal
+coherence for determining the fiducial positions.
 
 \noindent{\textbf Contribution}~~To address these problems, we propose a
 fiducial that is designed to be robust to motion blur.  Our design is based on
@@ -120,12 +125,8 @@ in a normal and blurred scene. The scene contains two ARTags and our code.
 
 \section{Related Work}
 
-[MSB: related works still needs a couple more passes, I've left it as it.
-as mentioned yesterday, we need to address the problems with the circular 
-pattern design, this needs to be done in the same paragraph, not later as done now. ]
-
-Our work is related to two areas: fiducial markers and
-object tracking. We will briefly discuss work done in both areas.
+Our work is related to two areas: fiducial markers and object tracking. We will
+briefly discuss work done in both areas.
 
 \begin{figure}
  \begin{subfigure}[b]{0.19\textwidth}
@@ -211,13 +212,13 @@ frames can be considered a tracking problem where the tracked object is fiducial
 There is a very large body of research dedicated to tracking and interested
 readers are referred to~\cite{Yilmaz:2006} for a survey.
 
-Most tracking methods( \cite{Ross:2008,Wu:2009,Perez02}
-\cite{Mei:2009} ) assume the image sequence to be blur free. In reality, however,
-motion blur in video sequences is often unavoidable. Wu et al.\cite{Wu:2011} have
-developed BLUr-driven Tracker (BLUT) framework for tracking motion-blurred
-targets. BLUT is based on the observation that although motion blurs degrade
-the visual features of the target, they at the same time, provide useful cues
-about the movements to help tracking.
+Most tracking methods( \cite{Ross:2008,Wu:2009,Perez02,Mei:2009} ) assume the
+image sequence to be blur free. In reality, however, motion blur in video
+sequences is often unavoidable. Wu et al.\cite{Wu:2011} have developed
+BLUr-driven Tracker (BLUT) framework for tracking motion-blurred targets. BLUT
+is based on the observation that although motion blurs degrade the visual
+features of the target, they at the same time, provide useful cues about the
+movements to help tracking.
 
 The BLUT framework successfully tracks blurred target when there is uniform motion
 and the position of tracked object does not change drastically in successive
@@ -233,35 +234,38 @@ our design as well as the detection algorithm used to find our marker in an imag
 \subsection{Examining Prior Fiducials Under Motion Blur}
 
 Before we detail the design of our fiducial, we examine the performance of two
-popular fiducials under motion blur.  Specifically we examine ARTags\cite{Fiala05} and PiTags\cite{Pitag13} given their difference in geometry design.
+popular fiducials under motion blur.  Specifically we examine ARTags
+\cite{Fiala05} and PiTags\cite{Pitag13} given their difference in geometry design.
 
-To simulate the appearance of the maker as seen by a quadcopter, 
-we scaled down ARTag as well as PiTag fiducial to size 150x150. 
- Both fiducials are then blurred at various orientations with different blurs scales
-(denoted in pixels).   The blur motion ranged from X to Y in magnitude, representing
-small to significant moton blur.   Figure \ref{fig:artag_pitag} shows the visual appearance
-of the blurred tags.   We then use try to detect the markers using the 
-ALVAR library\cite{alvar} and Pi-Tag library\cite{ros_pitag}.
+To simulate the appearance of the maker as seen by a quadcopter,  we scaled down
+ARTag as well as PiTag fiducial to size 150x150. Both fiducials are then blurred
+at various orientations with different blurs scales (denoted in pixels).   The
+blur motion ranged from 15 to 50 in magnitude, representing small to significant
+motion blur. Figure \ref{fig:artag_pitag} shows the visual appearance of the
+blurred tags. We then use try to detect the markers using the ALVAR
+library\cite{alvar} and Pi-Tag library\cite{ros_pitag}.
 The table in the left side of Figure
 \ref{fig:artag_pitag} shows the recognition rate (in percent) of two fiducial
-markers at various blur scales under different orientation.   As we can see, the PiTag performance quickly diminished under small amounts of blur, however, at 40 motion blur, ARTag is recognition rate drops to less than 20\%. 
+markers at various blur scales under different orientation.   As we can see,
+the PiTag performance quickly diminished under small amounts of blur, however,
+at 35 motion blur, ARTag is recognition rate drops to less than 20\%.
 
-\begin{minipage}[h!]{\textwidth}
-\centering
- \begin{minipage}{0.7\textwidth}
-\includegraphics[width=\linewidth]{artag_pitag.pdf}
+\noindent\begin{minipage}[h!]{\textwidth}
+\noindent\begin{minipage}{0.6\textwidth}
+\includegraphics[width=\textwidth]{artag_pitag.pdf}
 %\captionof{figure}{Blurred AR Tag and Pi--tag with various blur scales}
 \end{minipage}
-\begin{minipage}{0.25\textwidth}
+\begin{minipage}{0.35\textwidth}
 %\captionof{table}{Recognition rate of AR Tag and Pi-tag fiducial marker atvarious blur scales}
 \begin{tabularx}{\textwidth}{|Y|Y|Y|}
 \cline{1-3}
-\tiny{Blur} & \multicolumn{2}{c|}{\tiny{Recognition Rate}} \\\cline{2-3}
- \tiny{Scale}& \tiny{AR Tag} &	\tiny{Pi-Tag} \\ \cline{1-3}
-\tiny{15} & \tiny{100} & \tiny{100} \\ \cline{1-3}
-\tiny{30} & \tiny{0} & \tiny{100} \\  \cline{1-3}
-\tiny{35} & \tiny{0} & \tiny{19} \\ \cline{1-3}
-\tiny{50} & \tiny{0} & \tiny{0} \\ \cline{1-3}
+\small{Blur} & \multicolumn{2}{c|}{ \small{Recognition Rate}}
+\\\cline{2-3}
+\small{Scale}& \small{AR Tag} &	\small{Pi-Tag} \\ \cline{1-3}
+\small{15} & \small{100} & \small{100} \\ %\cline{1-3}
+\small{30} & \small{0} & \small{100} \\  %\cline{1-3}
+\small{35} & \small{0} & \small{19} \\ %\cline{1-3}
+\small{50} & \small{0} & \small{0} \\ \cline{1-3}
 \end{tabularx}
 \end{minipage}
 \label{fig:artag_pitag}
@@ -353,8 +357,10 @@ to detect circular patterns under blur.
 
 We have designed a fiducial that can be considered a binary code.  The design
 uses concentric white rings of equal widths on a black background with a
-blurred border\footnote{This design can be easily inverted to have a white background with white rings}. The outermost and innermost rings represent the start and end
-of the code and is embedded in the fiducial.  The binary code is represented by the presence (or absence) of rings between ``marker'' rings.
+blurred border\footnote{This design can be easily inverted to have a white
+background with white rings}. The outermost and innermost rings represent the
+start and end of the code and is embedded in the fiducial.  The binary code is
+represented by the presence (or absence) of rings between ``marker'' rings.
 
 \begin{figure}
 \centering
@@ -394,10 +400,15 @@ unaffected by the blur.  Because of our circular design, this means the
 perpendicular direction can be observed as a unblurred linear pattern.  Figure
 \ref{fig:blur_direction} shows an example with various motion directions.
 
-[MSB: You have to describe the algorithm here as discussed yesterday.  Please complete this
-part.]
- We give a brief overview of our algorithm here and details to each step in the following. Figure \ref{fig:overall_flow} shows the process involved in fiducial detection
-process. Our detection algorithm has four steps.  First, we apply a Gabor filter on the camera frame, next . . . 
+We give a brief overview of our algorithm here and details to each step in the
+following. Figure \ref{fig:overall_flow} shows the process involved in fiducial
+detection process. Our detection algorithm has four steps. First, we apply a
+Gabor filter (Step 1) on the image captured through AR Drone. Next, we find the
+clusters of patches found in Gabor output using hierarchical clustering (Step
+2). Later, we perform Principal Component Analysis (PCA) on each cluster, to
+find the blur invariant direction (Step 3). The intensity profile along this
+direction is found in the original image. And finally, we match this intensity
+profile with training data using K-Nearest neighbor classifier (Step 4). 
 
 \begin{comment}
 Overall flow of fiducial detection algorithm can be summarised as follows:
@@ -417,16 +428,17 @@ Overall flow of fiducial detection algorithm can be summarised as follows:
 \end{itemize}
 \end{comment}
 
-Figure \ref{fig:overall_flow} shows the process involved in fiducial detection
-process. 
-
-\begin{figure}
+\begin{figure}[ht!]
 \includegraphics[width=\linewidth]{overall_flow.pdf}
-\caption{Overall Workflow - [MSB: Details?  This is why I said this I didn't think this
-was the updated version of the paper. We discussed this yesterday, you need details in all of your captions.] }
+\caption{The flow of our algorithm to detect and classify fiducial in the scene
+captured from AR Drone. Four step process includes Gabor Filter(Step 1),
+Hierarchical Clustering (Step 2), PCA (Step 3) and Classification using
+K-Nearest Neighbor (KNN) classifier (Step 4). Training data for KNN classifier is gathered
+offline.}
 \label{fig:overall_flow}
 \end{figure}
 
+\noindent Details of each of the steps are as follows:\\
 \noindent\textbf{Gabor filter}: A 2D Gabor filter is a Gaussian kernel function
 modulated by a sinusoidal plane wave. It is used to find high gradient patches from the
 image. In our case, it will detect blur invariant sections of the fiducials. We
@@ -458,7 +470,11 @@ against training data using K-Nearest Neighbor Classifier (K=5) to output class 
 \begin{figure}[h!]
 \centering
   \includegraphics[width=\linewidth]{training_data.pdf}
-  \caption{Training data for the fiducial pattern with binary code ``01''}
+  \caption{Process to create training data for the fiducial pattern with binary
+  code ``01''. Synthetic pattern is blurred along various orientations. Gabor
+  filter is applied on the blurred pattern. Intensity profile is found along the
+  first principal component of the clustered Gabor output. Same process is used
+  to create training data for other fiducial patterns.}
   \label{fig:training_data}
 \end{figure}
 
@@ -475,11 +491,6 @@ further classification.
 
 \section{Experimental Validation}
 
-[MSB: As discussed yesterday, in the table reporting the results you need to give the 
-number of frames in tested video clip.  We may also need to comment on the
-number of dropped frames if this is possible to get. We mentioned this in the
-paper, but never mentioned this in the experimetal results.]
-
 We have implemented our algorithm in C++ using OpenCV library.
 Experiments were performed on a PC with Intel Core i7 processor(@3.4GHz) and 4GB RAM.
 Source code and data sets in this paper will be made publicly available.
@@ -490,7 +501,7 @@ pattern. Sample output for each fiducial pattern is shown in Figure
 \ref{fig:output0} -- Figure \ref{fig:output3}. Our detection process takes
 around 0.3 seconds and can handle three to four frames per second.
 
-\begin{figure}
+\begin{figure}[hb!]
 \begin{subfigure}{0.5\textwidth}
 \centering
   \includegraphics[width=\linewidth]{output_00.jpg}
@@ -515,16 +526,20 @@ around 0.3 seconds and can handle three to four frames per second.
   \caption{Binary code ``11''}
   \label{fig:output3}
   \end{subfigure}
-  \caption{Sample Outputs for two bit binary coded fiducials}
+  \caption{Sample outputs for two bit binary coded fiducials. Class label
+  attached to the detected fiducial is decimal equivalent of the binary code of
+  the detected fiducial.}
 \end{figure}
 
 Our system has also been tested on images containing multiple fiducial patterns
 in the same frame. Our algorithm successfully detected all fiducial patterns as
 well as correctly classified them as shown in Figure \ref{fig:output_all}.
+
 \begin{figure}
 \centering
   \includegraphics[width=.8\linewidth]{output_all_2.jpg}
-  \caption{Sample output containing all two bit binary coded fiducial patterns}
+  \caption{Sample output containing all two bit binary coded fiducial patterns
+  in single frame.}
   \label{fig:output_all}
 \end{figure}
 
@@ -538,7 +553,7 @@ orientations with different blur scales. Then, we tried to detect the patterns
 using algorithm presented in earlier section. The comparison of recognition
 rate is shown in Figure \ref{fig:recognition_rate}.
 
-\begin{figure}
+\begin{figure}[h!]
 \centering
 \includegraphics[width=\linewidth]{recognition_rate.png}
 \caption{Comparison of recognition rate of AR Tag and our fiducials on
@@ -558,75 +573,199 @@ around 1000 frames) The comparison of recognition rate is shown in Table
 \ref{tab:recongition_accuracy}. Classification accuracy of all fiducials (ARTag
 as well as ours) is almost 100\%.
 
-\begin{table}
+\begin{table}[h!]
 \caption{Comparison of recognition rate of AR Tag and our fiducials on real
 data captured through AR Drone. Each row shows analysis of a test
-dataset captured for our fiducial with different binary code embedded in it}
+dataset captured for our fiducial with different binary code embedded in it.
+Each dataset has around 1000 frames captured in around two minutes.}
 \centering
-\begin{tabularx}{0.8\textwidth}{|Y|Y|Y|Y|}
-\cline{1-4}
-\multirow{2}{*}{Test Dataset ID} & \multirow{2}{*}{Binary Code}
-&\multicolumn{2}{c|}{Recognition Rate (\%)} \\ \cline{3-4}
-& & Our Fiducial & AR Tag\\\cline{1-4}
-1 & 00 & 86.5 &  65.6 \\ \cline{1-4}
-2 & 01 & 94.1 &  61.9 \\ \cline{1-4}
-3 & 10 & 92.74 & 62.4 \\ \cline{1-4}
-4 & 11 & 93.54 & 60.3 \\ \cline{1-4}
+\begin{tabularx}{\textwidth}{|c|Y|Y|Y|Y|}
+\cline{1-5}
+\multirow{2}{*}{Test \#} & \multirow{2}{*}{Number of Frames}
+&\multirow{2}{*}{Binary Code} &\multicolumn{2}{c|}{Recognition Rate (\%)} \\
+\cline{4-5} & & & Our Fiducial & AR Tag\\\cline{1-5}
+1 & 1205 & 00 & 86.5 &  65.6 \\ \cline{1-5}
+2 & 1047 & 01 & 94.1 &  61.9 \\ \cline{1-5}
+3 & 1102 & 10 &  92.74 & 62.4 \\ \cline{1-5}
+4 & 1081 & 11 & 93.54 & 60.3 \\ \cline{1-5}
 \end{tabularx}
 \label{tab:recongition_accuracy}
 \end{table}
-
+ 
 \subsubsection{Comparison with BLUT}
 
-We have used sample image sequence (consisting of 20 frames [MSB: This is inviting trouble, I can guarentee you this will likely get your paper rejected.]) to test the performance of BLUT\cite{Wu:2011} and compare it with our result on the same
-image sequence. From Figure \ref{fig:BLUT_output}, it can be inferred that BLUT
-is able to track the fiducial when the position of fiducial does not change too
-much in successive frames. Also, it can be seen that, once BLUT looses the
-track of the fiducial, it is not able to recover from that. But, our algorithm
-is able to track the fiducial irrespective of the change in the position of the
-fiducial in the image as shown in Figure \ref{fig:our_output}.
+We have used four image sequences (consisting of around 1000 frames each) , each
+one containing our different fiducial pattern, to test the performance of
+BLUT\cite{Wu:2011} and compare it with our result on the same image sequence.
+From top rows of Figure \ref{fig:BLUT_compare_00}-\ref{fig:BLUT_compare_11}, it
+can be inferred that BLUT is able to track the fiducial when the position of
+fiducial does not change too much in successive frames. Also, it can be seen
+that, once BLUT looses the track of the fiducial, it is not able to recover
+from that. But, our algorithm is able to track the fiducial irrespective of the
+change in the position of the fiducial in the image as shown in bottom rows of Figure
+\ref{fig:BLUT_compare_00}-\ref{fig:BLUT_compare_11}.
+
+We have also found that, even if we reset the BLUT tracker after loosing track,
+it looses track again after around 100 frames i.e., approximately 6 seconds.
+When we checked the timestamp data from image header captured through AR Drone,
+we found that, there was difference of 0.14 seconds between two successive
+frames in the earlier case, which clearly suggests the dropping of frame. Also,
+there were around 50 instances in 1000 frames where timestamp difference between two
+successive frames was greater than 0.1 seconds. So, it is evident that
+due to dropping of frames combined with unstable motion of quadcopter, tracking
+through quadcopter using conventional tracking methods is not accurate.
 
 \begin{figure}
 \begin{subfigure}[b]{.19\textwidth}
-\includegraphics[width=\linewidth]{11.jpg}
+\includegraphics[width=\linewidth]{BLUT_output_00/2.jpg}
 \end{subfigure}
 \begin{subfigure}[b]{.19\textwidth}
-\includegraphics[width=\linewidth]{12.jpg}
+\includegraphics[width=\linewidth]{BLUT_output_00/3.jpg}
 \end{subfigure}
 \begin{subfigure}[b]{.19\textwidth}
-\includegraphics[width=\linewidth]{13.jpg}
+\includegraphics[width=\linewidth]{BLUT_output_00/4.jpg}
 \end{subfigure}
 \begin{subfigure}[b]{.19\textwidth}
-\includegraphics[width=\linewidth]{14.jpg}
+\includegraphics[width=\linewidth]{BLUT_output_00/5.jpg}
 \end{subfigure}
 \begin{subfigure}[b]{.19\textwidth}
-\includegraphics[width=\linewidth]{15.jpg}
+\includegraphics[width=\linewidth]{BLUT_output_00/6.jpg}
+\end{subfigure}\\
+\begin{subfigure}[b]{.19\textwidth}
+\includegraphics[width=\linewidth]{BLUT_input_00/output2.jpg}
 \end{subfigure}
-\caption{Output of BLUT on sample image sequence. It can be seen that from third
-frame, BLUT looses the track of our fiducial}
-\label{fig:BLUT_output}
+\begin{subfigure}[b]{.19\textwidth}
+\includegraphics[width=\linewidth]{BLUT_input_00/output3.jpg}
+\end{subfigure}
+\begin{subfigure}[b]{.19\textwidth}
+\includegraphics[width=\linewidth]{BLUT_input_00/output4.jpg}
+\end{subfigure}
+\begin{subfigure}[b]{.19\textwidth}
+\includegraphics[width=\linewidth]{BLUT_input_00/output5.jpg}
+\end{subfigure}
+\begin{subfigure}[b]{.19\textwidth}
+\includegraphics[width=\linewidth]{BLUT_input_00/output6.jpg}
+\end{subfigure}
+\caption{Top: Output of BLUT\cite{Wu:2011} on sample image sequence containing ``00''
+binary coded fiducial, Bottom: Output of our algorithm on the same image
+sequence. BLUT is able to track the fiducial till third frame, but from fourth
+frame, BLUT looses track of the fiducial. In first three frames, size of the
+fiducials is less but in fourth and fifth frame it is bigger, hinting sudden
+forward movement of quadcopter.}
+\label{fig:BLUT_compare_00}
 \end{figure}
 
 \begin{figure}
 \begin{subfigure}[b]{.19\textwidth}
-\includegraphics[width=\linewidth]{output11.jpg}
+\includegraphics[width=\linewidth]{BLUT_output_01/11.jpg}
 \end{subfigure}
 \begin{subfigure}[b]{.19\textwidth}
-\includegraphics[width=\linewidth]{output12.jpg}
+\includegraphics[width=\linewidth]{BLUT_output_01/12.jpg}
 \end{subfigure}
 \begin{subfigure}[b]{.19\textwidth}
-\includegraphics[width=\linewidth]{output13.jpg}
+\includegraphics[width=\linewidth]{BLUT_output_01/13.jpg}
 \end{subfigure}
 \begin{subfigure}[b]{.19\textwidth}
-\includegraphics[width=\linewidth]{output14.jpg}
+\includegraphics[width=\linewidth]{BLUT_output_01/14.jpg}
 \end{subfigure}
 \begin{subfigure}[b]{.19\textwidth}
-\includegraphics[width=\linewidth]{output15.jpg}
+\includegraphics[width=\linewidth]{BLUT_output_01/15.jpg}
+\end{subfigure}\\
+\begin{subfigure}[b]{.19\textwidth}
+\includegraphics[width=\linewidth]{BLUT_input_01/output11.jpg}
 \end{subfigure}
-\caption{Output of our algorithm on image sequence used in
-Figure \ref{fig:BLUT_output}. Our algorithm is able to detect our fiducial in
-all frames.}
-\label{fig:our_output}
+\begin{subfigure}[b]{.19\textwidth}
+\includegraphics[width=\linewidth]{BLUT_input_01/output12.jpg}
+\end{subfigure}
+\begin{subfigure}[b]{.19\textwidth}
+\includegraphics[width=\linewidth]{BLUT_input_01/output13.jpg}
+\end{subfigure}
+\begin{subfigure}[b]{.19\textwidth}
+\includegraphics[width=\linewidth]{BLUT_input_01/output14.jpg}
+\end{subfigure}
+\begin{subfigure}[b]{.19\textwidth}
+\includegraphics[width=\linewidth]{BLUT_input_01/output15.jpg}
+\end{subfigure}
+\caption{Top: Output of BLUT\cite{Wu:2011} on sample image sequence containing
+``01'' binary coded fiducial, Bottom: Output of our algorithm on the same image
+sequence. BLUT looses the track from third frame.}
+\label{fig:BLUT_compare_01}
+\end{figure}
+
+\begin{figure}
+\begin{subfigure}[b]{.19\textwidth}
+\includegraphics[width=\linewidth]{BLUT_output_10/1.jpg}
+\end{subfigure}
+\begin{subfigure}[b]{.19\textwidth}
+\includegraphics[width=\linewidth]{BLUT_output_10/2.jpg}
+\end{subfigure}
+\begin{subfigure}[b]{.19\textwidth}
+\includegraphics[width=\linewidth]{BLUT_output_10/3.jpg}
+\end{subfigure}
+\begin{subfigure}[b]{.19\textwidth}
+\includegraphics[width=\linewidth]{BLUT_output_10/4.jpg}
+\end{subfigure}
+\begin{subfigure}[b]{.19\textwidth}
+\includegraphics[width=\linewidth]{BLUT_output_10/5.jpg}
+\end{subfigure}\\
+\begin{subfigure}[b]{.19\textwidth}
+\includegraphics[width=\linewidth]{BLUT_input_10/output1.jpg}
+\end{subfigure}
+\begin{subfigure}[b]{.19\textwidth}
+\includegraphics[width=\linewidth]{BLUT_input_10/output2.jpg}
+\end{subfigure}
+\begin{subfigure}[b]{.19\textwidth}
+\includegraphics[width=\linewidth]{BLUT_input_10/output3.jpg}
+\end{subfigure}
+\begin{subfigure}[b]{.19\textwidth}
+\includegraphics[width=\linewidth]{BLUT_input_10/output4.jpg}
+\end{subfigure}
+\begin{subfigure}[b]{.19\textwidth}
+\includegraphics[width=\linewidth]{BLUT_input_10/output5.jpg}
+\end{subfigure}
+\caption{Top: Output of BLUT\cite{Wu:2011} on sample image sequence containing
+``10'' binary coded fiducial, Bottom: Output of our algorithm on the same image
+sequence. From second frame itself, BLUT looses the track.}
+\label{fig:BLUT_compare_10}
+\end{figure}
+
+\begin{figure}
+\begin{subfigure}[b]{.19\textwidth}
+\includegraphics[width=\linewidth]{BLUT_output_11/2.jpg}
+\end{subfigure}
+\begin{subfigure}[b]{.19\textwidth}
+\includegraphics[width=\linewidth]{BLUT_output_11/3.jpg}
+\end{subfigure}
+\begin{subfigure}[b]{.19\textwidth}
+\includegraphics[width=\linewidth]{BLUT_output_11/4.jpg}
+\end{subfigure}
+\begin{subfigure}[b]{.19\textwidth}
+\includegraphics[width=\linewidth]{BLUT_output_11/5.jpg}
+\end{subfigure}
+\begin{subfigure}[b]{.19\textwidth}
+\includegraphics[width=\linewidth]{BLUT_output_11/6.jpg}
+\end{subfigure}\\
+\begin{subfigure}[b]{.19\textwidth}
+\includegraphics[width=\linewidth]{BLUT_input_11/output2.jpg}
+\end{subfigure}
+\begin{subfigure}[b]{.19\textwidth}
+\includegraphics[width=\linewidth]{BLUT_input_11/output3.jpg}
+\end{subfigure}
+\begin{subfigure}[b]{.19\textwidth}
+\includegraphics[width=\linewidth]{BLUT_input_11/output4.jpg}
+\end{subfigure}
+\begin{subfigure}[b]{.19\textwidth}
+\includegraphics[width=\linewidth]{BLUT_input_11/output5.jpg}
+\end{subfigure}
+\begin{subfigure}[b]{.19\textwidth}
+\includegraphics[width=\linewidth]{BLUT_input_11/output6.jpg}
+\end{subfigure}
+\caption{Top: Output of BLUT\cite{Wu:2011} on sample image sequence containing
+``11'' binary coded fiducial, Bottom: Output of our algorithm on the same image
+sequence. BlUT lost the track from third frame. There is sudden reversal of
+direction of quadcopter from third frame. In first two frames quadcopter was
+going up, but suddenly it moved down in third frame.}
+\label{fig:BLUT_compare_11}
 \end{figure}
 
 \section{Discussion}
