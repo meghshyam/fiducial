@@ -17,7 +17,7 @@
 
 
 //#define TRAIN_MODE
-//define DEBUG
+//#define DEBUG
 //#define DEBUG2
 //#define DEBUG3
 
@@ -100,7 +100,7 @@ int main(int argc, char* argv[])
 	doCluster(connectedComponents, clusters);
 	int numClusters = clusters.rows;
 #ifdef DEBUG
-	Mat cloned_input = input.clone();
+	//Mat cloned_input = input.clone();
 #endif
 	for(int i=0; i<numClusters; i++)
 	{
@@ -387,9 +387,9 @@ bool detectCode(const Mat &pts, int left, int top, int right, int bottom, const 
 			Point last_pt = downward_pts.back();
 			if (index ==1)
 				line(cloned_input, first_pt, last_pt, Scalar(0,255,0), 3);
-
 		}
-*/
+		*/
+
 		reverse(upward_pts.begin(), upward_pts.end());
 		line_pts[index] = upward_pts;
 		line_pts[index].insert(line_pts[index].end(), downward_pts.begin(), downward_pts.end());
@@ -408,13 +408,14 @@ bool detectCode(const Mat &pts, int left, int top, int right, int bottom, const 
 	imwrite("pca.jpg", cloned_input);
 	*/
 #ifdef DEBUG
-	Mat cloned_input = input.clone();
+	//Mat cloned_input = input.clone();
 #endif
 	vector<int> ring_starts[3];
 	vector<int> ring_widths[3];
 	for(int i=0; i<3; i++){
 		int totalPoints = numPtsPerLine[i];
 		Mat profile(totalPoints, 1, CV_8U, intensities[i]);
+		normalize(profile, profile, 0, 255, NORM_MINMAX, CV_8UC1);
 		//Mat smoothProfile;
 		//boxFilter(profile, smoothProfile, CV_32FC1, Size(5,1));
 		Mat thresh_profile;
