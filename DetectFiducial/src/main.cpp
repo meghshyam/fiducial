@@ -30,6 +30,7 @@ void doCluster(const Mat&, Mat&);
 void getPoints(const Mat &binOutput, int left, int top, int right, int bottom, Mat &outPts);
 bool detectCode(const Mat &pts, int left, int top, int right, int bottom, const Mat &input, vector<float>& intensity_profile, int& num_rings );
 void createTrainingData(const string &orig_dirname, Mat & trainingData, Mat & response);
+Point center;
 
 int findDiffMinMax(vector<int> ring_widths[], int dim, int first, int second){
 	vector<int> first_ring_width = ring_widths[first];
@@ -198,11 +199,13 @@ int main(int argc, char* argv[])
 			Point pt_text_end = pt2 + Point(82,0);
 			rectangle(output,pt_text_start, pt_text_end, Scalar(0,255,255),-1);
 			putText(output, str, pt2, FONT_HERSHEY_DUPLEX, 0.75, Scalar(0,0,255));
+			circle(output, center, 1, Scalar(0,0,255), -1, 8, 0);
 			break;
 		}
 	}
 	//imshow("output", output);
 	waitKey();
+	cout<<"Center:"<<center<<"\n";
 	imwrite("output.jpg", output);
 	if(!found){
 		cout<<"Code not detected\n";
@@ -381,14 +384,18 @@ bool detectCode(const Mat &pts, int left, int top, int right, int bottom, const 
 				}
 			}
 		}
-/*
+
 		if(upward_pts.size() > 0 && downward_pts.size() > 0){
 			Point first_pt = upward_pts.back();
 			Point last_pt = downward_pts.back();
-			if (index ==1)
-				line(cloned_input, first_pt, last_pt, Scalar(0,255,0), 3);
+			if (index ==1){
+				center = first_pt + last_pt;
+				center.x = center.x/2;
+				center.y = center.y/2;
+				//line(cloned_input, first_pt, last_pt, Scalar(0,255,0), 3);
+			}
 		}
-		*/
+
 
 		reverse(upward_pts.begin(), upward_pts.end());
 		line_pts[index] = upward_pts;
