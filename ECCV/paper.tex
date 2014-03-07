@@ -67,8 +67,10 @@ The recent availability of low-cost quadcopters have helped to fuel significant
 efforts in research focused on unmanned aerial vehicles. Navigation and planning of
 these vehicles is typically performed using onboard inertial sensors and/or
 vision based modules that uses visual cues in the real world~(e.g.,
-\cite{Davison:2007,Engel12,Engel13}). However, to evaluate the effectiveness of navigation methods, fiducial markers are commonly placed into the environment to provide additional information that serves for ground-truth
-positional measurements (e.g., \cite{Bosnak:2012,Lim09,Klopschitz:2007}).
+\cite{Davison:2007,Engel12,Engel13}). However, to evaluate the effectiveness of
+navigation methods, fiducial markers are commonly placed into the environment
+to provide additional information that serves for ground-truth positional
+measurements (e.g., \cite{Bosnak:2012,Lim09,Klopschitz:2007}).
 
 In order to be effective, fiducial markers (or simply, fiducials) need
 to be easily detected in the scene. A variety of fiducial markers
@@ -349,7 +351,7 @@ and (Step 4) K-NN classification using training-data captured for each pattern.}
 \end{figure}
 
 \noindent Details of each of the steps are as follows:\\
-\noindent\textbf{Gabor filter}: A 2D Gabor filter is a Gaussian kernel function
+\noindent\textbf{Gabor filter}~~A 2D Gabor filter is a Gaussian kernel function
 modulated by a sinusoidal plane wave~\cite{Kruizinga:2002}. It is used to find
 high gradient patches from the image. In our case, it is used to detect portions
 of the circular fiducials that were not affected by the blur. 
@@ -363,13 +365,13 @@ $\ell^2$-normalized image is thresholded with threshold set to $0.4$ (on scale o
 one).  For further details to the Gabor filter, see~\cite{Kruizinga:2002}.
 %% MBS - is the Kruizinga filter resonable to cite?
 
-\noindent\textbf{Clustering}: The binarized Gabor filter responses are
+\noindent\textbf{Clustering}~~The binarized Gabor filter responses are
 treated as a set of connected components in the image.   Clustering
 is used to find components that are located in a close spatial region.  We do
 this via hierarchical clustering~\cite{ALGLIB} using unweighted
 average linkage with a distance threshold set to 150.
 
-\noindent\textbf{PCA}: For each clustered set of components, we apply
+\noindent\textbf{PCA}~~For each clustered set of components, we apply
 PCA to determine the dominant direction.  This is done by examining the
 orientation of the first principal component.  We then extract an intensity
 profile patch in the input image along this direction as it extends through the
@@ -385,8 +387,8 @@ Clustered components that have allowable transitions counts and transitions with
 uniform widths are further considered for classification to determine
 the binary code.
 
-\noindent\textbf{Classification}: As mentioned above, a small image patch containing
-the intensity profile of the fiducial is used to identify the code.   We found
+\noindent\textbf{Classification}~~As mentioned above, a small image patch
+containing the intensity profile of the fiducial is used to identify the code.   We found
 that a training-based method using K-NN gave better results than trying to
 find binary code directly by determining the presence (or absence) of ring
 at particular positions in the image patch. To build the training-data, a
@@ -525,15 +527,17 @@ different blur scales.}
 We also compared results on the recorded feed using AR Drone quadcopter. In our
 experimental setup, we have placed two ARTags in the scene along with our fiducial  to
 compare the resilience of blur by each fiducial type. We have used
-ar\_track\_alvar, ROS Wrapper for the ALVAR library~\cite{ros_alvar}, to detect the ARTags from the stream captured with the quadcopter camera. In each test dataset, we
-have used different two bit binary coded fiducial and recorded video of around
-two minute duration (i.e., around 1000 frames).   The quadcopter was flown in a routine
-manner in the room with its camera facing the wall (see supplementary
-videos). The comparison of the recognition rate is shown in Table
-\ref{tab:recongition_accuracy}. Recognition rate of our fiducials ranges from
-86.5\% to 94.1\%, while the ARTag is 60.3\% to 65.6\%. Classification
-accuracy of all fiducials (ARTag as well as ours) was approximately 100\%, i.e.,
-when tags were detected they were the correct fiducials and not other objects in the scene.
+ar\_track\_alvar, ROS Wrapper for the ALVAR library~\cite{ros_alvar}, to detect
+the ARTags from the stream captured with the quadcopter camera. In each test
+dataset, we have used different two bit binary coded fiducial and recorded
+video of around two minute duration (i.e., around 1000 frames).   The
+quadcopter was flown in a routine manner in the room with its camera facing the
+wall (see supplementary videos). The comparison of the recognition rate is
+shown in Table \ref{tab:recongition_accuracy}. Recognition rate of our
+fiducials ranges from 86.5\% to 94.1\%, while the ARTag is 60.3\% to 65.6\%.
+Classification accuracy of all fiducials (ARTag as well as ours) was
+approximately 100\%, i.e., when tags were detected they were the correct
+fiducials and not other objects in the scene.
 
 \begin{figure}[hb!]
 \begin{subfigure}{\textwidth}
