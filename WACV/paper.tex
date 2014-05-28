@@ -123,27 +123,27 @@ briefly discuss work done in both areas.
 
 \begin{figure}
 \centering
- \begin{subfigure}[b]{0.19\textwidth}
+ \begin{subfigure}[b]{0.19\linewidth}
   \centering
   \includegraphics[width=0.8\linewidth]{intersense.jpg}
   Circular Data Matrix~\cite{NaimarkF02}
  \end{subfigure}\quad
- \begin{subfigure}[b]{0.14\textwidth}
+ \begin{subfigure}[b]{0.14\linewidth}
  \centering
   \includegraphics[width=\linewidth]{pattKanji.pdf}
   ARToolkit~\cite{ARToolkit02}
  \end{subfigure}\quad
- \begin{subfigure}[b]{0.14\textwidth}
+ \begin{subfigure}[b]{0.14\linewidth}
   \centering
   \includegraphics[width=\linewidth]{ARtag.jpg}
   ARTag\quad~\cite{Fiala05}
  \end{subfigure}\quad
- \begin{subfigure}[b]{0.14\textwidth}
+ \begin{subfigure}[b]{0.14\linewidth}
   \centering
   \includegraphics[width=\linewidth]{pifiducial.jpg}
   PiTag\quad~\cite{Pitag13}
  \end{subfigure}\quad
- \begin{subfigure}[b]{0.14\textwidth}
+ \begin{subfigure}[b]{0.14\linewidth}
   \centering
   \includegraphics[width=\linewidth]{our_fiducial}
   Our Fiducial
@@ -247,14 +247,11 @@ As we can see, the PiTag performance quickly diminishes under small amounts of
 blur, while at 35 motion blur, the ARTag's recognition rate drops to less than
 20\%.
 
-\noindent\begin{minipage}[h!]{\textwidth}
-\noindent\begin{minipage}{0.6\textwidth}
-\includegraphics[width=\textwidth]{artag_pitag.pdf}
+\noindent\begin{figure}
+\includegraphics[width=\linewidth]{artag_pitag.pdf}
 %\captionof{figure}{Blurred AR Tag and Pi--tag with various blur scales}
-\end{minipage}
-\begin{minipage}{0.35\textwidth}
 %\captionof{table}{Recognition rate of AR Tag and Pi-tag fiducial marker atvarious blur scales}
-\begin{tabularx}{\textwidth}{|Y|Y|Y|}
+\begin{tabularx}{\linewidth}{|Y|Y|Y|}
 \cline{1-3}
 \small{Blur} & \multicolumn{2}{c|}{ \small{Recognition Rate}}
 \\\cline{2-3}
@@ -264,14 +261,13 @@ blur, while at 35 motion blur, the ARTag's recognition rate drops to less than
 \small{35} & \small{0} & \small{19} \\ %\cline{1-3}
 \small{50} & \small{0} & \small{0} \\ \cline{1-3}
 \end{tabularx}
-\end{minipage}
 \captionof{figure}{Figure showing PiTag and ARTag blurred with various blur
 scales at different orientations. Table on the right shows the recognition rate
 (in percent) of both fiducial markers at various blur scales along all blur
 orientations.  Recognition rates for both tags are significantly reduced due to
 blur. For severe blur, detection is not possible.}
 \label{fig:artag_pitag}
-\end{minipage}
+\end{figure}
 
 \subsection{Blur Resistant Fiducial}
 
@@ -481,7 +477,7 @@ maximum scale it can handle.}
 \label{fig:blur_maximum}
 \end{figure}
 
-\noindent\begin{figure}
+\noindent\begin{figure*}
 \begin{tabular}{c|c}
 \begin{subfigure}[b]{0.65\linewidth}
 \includegraphics[width=\linewidth]{recognition_rate.pdf}
@@ -513,7 +509,7 @@ fiducial with binary code ``00'', our fiducial patterns are recognized all times
 versus the ground truth.  Error is computed for various blur angles over
 different blur scales.}
 \label{fig:simulated_blur}
-\end{figure}
+\end{figure*}
 
 We also compared results on the recorded feed using AR Drone quadcopter. In our
 experimental setup, we have placed two ARTags in the scene along with our fiducial  to
@@ -531,28 +527,28 @@ approximately 100\%, i.e., when tags were detected they were the correct
 fiducials and not other objects in the scene.
 
 \begin{figure}[hb!]
-\begin{subfigure}{\textwidth}
+\begin{subfigure}{\linewidth}
 \centering
   \includegraphics[width=0.4\linewidth]{output_00.jpg}
   \includegraphics[width=0.4\linewidth]{new_results/output_00.jpg}
   \caption{Binary code ``00''}
   \label{fig:output0}
 \end{subfigure}
-\begin{subfigure}{\textwidth}
+\begin{subfigure}{\linewidth}
 \centering
   \includegraphics[width=0.4\linewidth]{output_01.jpg}
   \includegraphics[width=0.4\linewidth]{new_results/output_01.jpg}
   \caption{Binary code ``01''}
   \label{fig:output1}
 \end{subfigure}
-\begin{subfigure}{\textwidth}
+\begin{subfigure}{\linewidth}
 \centering
   \includegraphics[width=0.4\linewidth]{output_10.jpg}
   \includegraphics[width=0.4\linewidth]{new_results/output_10.jpg}
   \caption{Binary code ``10''}
   \label{fig:output2}
 \end{subfigure}
-\begin{subfigure}{\textwidth}
+\begin{subfigure}{\linewidth}
 \centering
   \includegraphics[width=0.4\linewidth]{output_11.jpg}
   \includegraphics[width=0.4\linewidth]{new_results/output_11.jpg}
@@ -565,16 +561,16 @@ fiducials and not other objects in the scene.
   \label{fig:out_outputs}
 \end{figure}
 
-\begin{table}[h!]
+\begin{table}[t!]
 \caption{Comparison of recognition rate of ARTag and our fiducials on real
 data captured through AR Drone. Each row shows analysis of a test
 dataset captured for our fiducial with different binary code embedded in it.
 Each dataset has around 1000 frames captured representing roughly two minutes of video each.}
 \centering
-\begin{tabularx}{\textwidth}{|c|Y|Y|Y|Y|}
+\begin{tabularx}{\linewidth}{|c|Y|Y|Y|Y|}
 \cline{1-5}
-\multirow{2}{*}{Test \#} & \multirow{2}{*}{Number of Frames}
-&\multirow{2}{*}{Binary Code} &\multicolumn{2}{c|}{Recognition Rate (\%)} \\
+\multirow{2}{*}{Test \#} & {Number of frames}
+&{Binary Code} &\multicolumn{2}{c|}{Recognition Rate (\%)} \\
 \cline{4-5} & & & ARTag & Our Fiducial \\\cline{1-5}
 1 & 1205 & 00 &  65.6 & 86.5  \\ \cline{1-5}
 2 & 1047 & 01 &  61.9 & 94.1  \\ \cline{1-5}
@@ -611,7 +607,7 @@ culprits causing the BLUT tracker to fail is the dropping of frames combined
 with unstable motion of quadcopter resulting in large discrepancies in the
 patterns position between successive frames.
 
-\begin{figure}
+\begin{figure*}
 \begin{subfigure}[b]{.19\textwidth}
 \includegraphics[width=\linewidth]{BLUT_output_00/2.jpg}
 \end{subfigure}
@@ -649,9 +645,9 @@ frame BLUT looses track of the fiducial. In first three frames, the size of the
 fiducials is less but in fourth and fifth frame it is bigger, hinting at a sudden
 forward movement of quadcopter.}
 \label{fig:BLUT_compare_00}
-\end{figure}
+\end{figure*}
 
-\begin{figure}
+\begin{figure*}
 \begin{subfigure}[b]{.19\textwidth}
 \includegraphics[width=\linewidth]{BLUT_output_01/11.jpg}
 \end{subfigure}
@@ -686,9 +682,9 @@ forward movement of quadcopter.}
 ``01'' binary coded fiducial. Bottom: Output of our algorithm on the same image
 sequence. BLUT looses the track from the third frame.}
 \label{fig:BLUT_compare_01}
-\end{figure}
+\end{figure*}
 
-\begin{figure}
+\begin{figure*}
 \begin{subfigure}[b]{.19\textwidth}
 \includegraphics[width=\linewidth]{BLUT_output_10/1.jpg}
 \end{subfigure}
@@ -723,9 +719,9 @@ sequence. BLUT looses the track from the third frame.}
 ``10'' binary coded fiducial. Bottom: Output of our algorithm on the same image
 sequence. From the second frame, BLUT looses track.}
 \label{fig:BLUT_compare_10}
-\end{figure}
+\end{figure*}
 
-\begin{figure}
+\begin{figure*}
 \begin{subfigure}[b]{.19\textwidth}
 \includegraphics[width=\linewidth]{BLUT_output_11/2.jpg}
 \end{subfigure}
@@ -762,7 +758,7 @@ sequence. BLUT lost the track from third frame. There is sudden reversal of
 direction from the quadcopter in the third frame. In first two frames, the quadcopter was
 going up, but suddenly moved down.}
 \label{fig:BLUT_compare_11}
-\end{figure}
+\end{figure*}
 
 \section{Discussion}\label{sec:discussion}
 
