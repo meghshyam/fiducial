@@ -417,19 +417,32 @@ can classify the pattern as class 0 or the maximum class containing all 1s.
 We have implemented our algorithm in C++ using the OpenCV library.
 Experiments were performed on a PC with Intel Core i7 processor(@3.4GHz) and 4GB RAM.
 Source code to generate and recognize the code, as well as the data sets used in
-this paper will be made publicly available.  Video clips
-of collected data are provided in the supplementary material.
+this paper will be made publicly available.  
+%Video clips of collected data are provided in the supplementary material.
 
 Our system has been tested on several image sequences captured from an AR Drone
 quadcopter.  The drone was flown indoors looking at patterns attached to
 various walls. Each image sequence contains frames of different fiducial
 patterns. Sample output for each fiducial pattern is shown in Figure
-\ref{fig:out_outputs}-(a) -- Figure \ref{fig:out_outputs}-(d). Our detection
-process takes around 0.3 seconds which translates to slightly over three frames per second.
+\ref{fig:out_outputs}. Our detection process takes around 0.3 seconds which
+translates to slightly over three frames per second.
 
 Our system has also been tested on images containing multiple fiducial patterns
 in the same frame. Our algorithm can successfully detected all fiducial patterns as
 well as correctly classified them as shown in Figure \ref{fig:output_all}.
+
+\begin{figure}[hb!]
+\centering
+  \includegraphics[width=0.4\linewidth]{output_00.jpg}
+  \includegraphics[width=0.4\linewidth]{output_01.jpg}
+  \includegraphics[width=0.4\linewidth]{output_10.jpg}
+  \includegraphics[width=0.4\linewidth]{output_11.jpg}
+  \caption{Sample outputs for two bit binary coded fiducials on different
+  datasets. Class label attached to the detected fiducial is decimal equivalent
+  of the binary code embedded in the detected fiducial.}
+  \label{fig:out_outputs}
+\end{figure}
+
 
 \begin{figure}[ht!]
 \centering
@@ -526,41 +539,6 @@ Classification accuracy of all fiducials (ARTag as well as ours) was
 approximately 100\%, i.e., when tags were detected they were the correct
 fiducials and not other objects in the scene.
 
-\begin{figure}[hb!]
-\begin{subfigure}{\linewidth}
-\centering
-  \includegraphics[width=0.4\linewidth]{output_00.jpg}
-  \includegraphics[width=0.4\linewidth]{new_results/output_00.jpg}
-  \caption{Binary code ``00''}
-  \label{fig:output0}
-\end{subfigure}
-\begin{subfigure}{\linewidth}
-\centering
-  \includegraphics[width=0.4\linewidth]{output_01.jpg}
-  \includegraphics[width=0.4\linewidth]{new_results/output_01.jpg}
-  \caption{Binary code ``01''}
-  \label{fig:output1}
-\end{subfigure}
-\begin{subfigure}{\linewidth}
-\centering
-  \includegraphics[width=0.4\linewidth]{output_10.jpg}
-  \includegraphics[width=0.4\linewidth]{new_results/output_10.jpg}
-  \caption{Binary code ``10''}
-  \label{fig:output2}
-\end{subfigure}
-\begin{subfigure}{\linewidth}
-\centering
-  \includegraphics[width=0.4\linewidth]{output_11.jpg}
-  \includegraphics[width=0.4\linewidth]{new_results/output_11.jpg}
-  \caption{Binary code ``11''}
-  \label{fig:output3}
-  \end{subfigure}
-  \caption{Sample outputs for two bit binary coded fiducials on different
-  datasets. Class label attached to the detected fiducial is decimal equivalent
-  of the binary code embedded in the detected fiducial.}
-  \label{fig:out_outputs}
-\end{figure}
-
 \begin{table}[t!]
 \caption{Comparison of recognition rate of ARTag and our fiducials on real
 data captured through AR Drone. Each row shows analysis of a test
@@ -580,6 +558,30 @@ Each dataset has around 1000 frames captured representing roughly two minutes of
 \label{tab:recongition_accuracy}
 \end{table}
 
+In another setup we arranged our fiducials on four sides of a box and revolved
+quadcopter around it. Later, we repeated the process by replacing our fiducial
+by AR Tags. Some intermediate frames are shown in Figure \ref{fig:setup}.
+
+\begin{figure*}
+\begin{subfigure}[b]{.19\textwidth}
+\includegraphics[width=\linewidth]{setup_our/output_6/output_514.jpg}
+\end{subfigure}
+\begin{subfigure}[b]{.19\textwidth}
+\includegraphics[width=\linewidth]{setup_our/output_6/output_556.jpg}
+\end{subfigure}
+\begin{subfigure}[b]{.19\textwidth}
+\includegraphics[width=\linewidth]{setup_our/output_2/output_35.jpg}
+\end{subfigure}
+\begin{subfigure}[b]{.19\textwidth}
+\includegraphics[width=\linewidth]{setup_our/output_2/output_330.jpg}
+\end{subfigure}
+\begin{subfigure}[b]{.19\textwidth}
+\includegraphics[width=\linewidth]{setup_our/output_6/output_943.jpg}
+\end{subfigure}
+\caption{Figure showing intermediate frames captured by quadcopter while
+revolving around our setup}
+\label{fig:setup}
+\end{figure*}
 \subsubsection{Comparison with BLUT}
 
 We also compare our approach with tracking designed for blurred input scenes.
@@ -765,37 +767,36 @@ going up, but suddenly moved down.}
 We have demonstrated the effectiveness of our blur invariant fiducial both
 synthetically and on real video clips captured from a quadcopter.   Our approach obtains
 approximately 86-95\% recognition rate on fiducals in real scenes compared to existing codes
-that are around 64\%.  We discuss some limitations of our approach in the following.
-
-\noindent\textbf{Processing Time}~~Currently, our processing time (0.3 seconds
-per frame) does not provide real-time performance.  As such, we currently
-envision this will be used in an offline manner for performing analysis of
-flight paths. Code profiling revealed that the Gabor filtering along the eight
+that are around 64\%.  We discuss some limitations of our approach in the
+section.
+%\noindent\textbf{Processing Time}~~
+Currently, our processing time (0.3 seconds per frame) does not provide
+real-time performance.  As such, we currently envision this will be used in an
+offline manner for performing analysis of flight paths. Code profiling revealed that the Gabor filtering along the eight
 directions takes most of the time (0.03 -- 0.04 seconds per orientation).  Either an
 improved Gabor filter scheme is required or an alternative strategy for
 detection is required.
-
-\noindent\textbf{False Negatives}~~We found that sometimes our detection
+%\noindent\textbf{False Negatives}~~
+We found that sometimes our detection
 algorithm fails to recognize our fiducial with binary code ``00'' when there is
 large amount of blur.  The is because when there is too much blur, the innermost
 ring's response in the Gabor output is too low and not detected properly.
 This problem can be resolved by increasing the radius of innermost ring to
 reduce the effect of blur on the innermost ring. 
-
-\noindent\textbf{Pose Estimation}~~We note that other markers are able to give
+%\noindent\textbf{Pose Estimation}~~
+We note that other markers are able to give
 full pose estimation after detection.  However, we are only able to reliably detect
 the center point and therefore cannot estimate pose.  Of course, if four
 markers were used in a known order, pose could be estimated. The current
 resolution of onboard camera will be main hurdle to clear before we can
 effectively use multiple markers in each scene.
-
-\noindent\textbf{Number of Fiducials}~~Currently, compared to ARTag fiducial
-markers, we are able to generate less number of fiducials. Many applications in
-robotics (e.g. quadcopter navigation) may not require large number of fiducial
-markers as available by ARTag.  Most of the time, it is sufficient to have 4-6
-different fiducial patterns. Still, we may be able to generate a larger number of
-fiducials by using color backgrounds. This is an area interest for further
-investigation.
+%\noindent\textbf{Number of Fiducials}~~
+Currently, compared to ARTag fiducial markers, we are able to generate less
+number of fiducials. Many applications in robotics (e.g. quadcopter navigation)
+may not require large number of fiducial markers as available by ARTag.  Most
+of the time, it is sufficient to have 4-6 different fiducial patterns. Still,
+we may be able to generate a larger number of fiducials by using color
+backgrounds. This is an area interest for further investigation.
 
 \section{Conclusion}
 
