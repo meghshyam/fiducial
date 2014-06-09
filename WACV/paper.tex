@@ -18,6 +18,7 @@
 \setlength{\floatsep}{7pt plus 2pt minus 2pt}
 \setlength{\textfloatsep}{5pt plus 2pt minus 2pt}
 \setlength{\intextsep}{5pt plus 2pt minus 2pt}
+\interfootnotelinepenalty=10000
 % Include other packages here, before hyperref.
 
 % If you comment hyperref and then uncomment it, you should delete
@@ -38,7 +39,7 @@
 
 \begin{abstract}
 
-  fiducials are commonly placed in environments to provide a
+  Fiducials are commonly placed in environments to provide a
   uniquely identifiable object in the scene.  In quadcopter
   applications, these fiducials are often used to evaluate planning
   algorithms given that ground truth positions can be
@@ -256,10 +257,10 @@ Here we examine the the performance of two popular fiducials under
 motion blur.  Specifically we examine ARTags ~\cite{Fiala05} and
 PiTags~\cite{Pitag13} given their differences in geometric design and
 the availability of an API to develop applications to recognize the tags.
-\footnote{RUNE-tag~\cite{runetag11} currently does not provide access to  an
-implementation to generate or recognize its tags.  The circular data
-matrix~\cite{NaimarkF02} is available as a commercial product, however
-it requires proprietary hardware.}
+\footnote{RUNE-tag~\cite{runetag11} currently does not
+provide access to an implementation to generate or recognize its tags. 
+The circular data matrix~\cite{NaimarkF02} is available as a
+commercial product, however it requires proprietary hardware.}
 
 %To evaluate the ARTag and PiTag under blur, 
 For controlled study, we simulate the appearance of the ARTag and PiTag
@@ -271,8 +272,7 @@ blur. Figure~\ref{fig:artag_pitag} shows the visual appearance of the blurred
 tags. We then try to detect the markers using the ALVAR library~\cite{alvar} and
 PiTag library~\cite{ros_pitag}. The table in %the right side of
 Figure~\ref{fig:artag_pitag} shows the recognition rate (in
-percentage) of the two
-fiducials at various blur scales over all  orientations.
+percentage) of the two fiducials at various blur scales over all  orientations.
 As we can see, the PiTag performance quickly diminishes under small amounts of
 blur, while at 35 units, the ARTag's recognition rate drops to less than
 20\%.
