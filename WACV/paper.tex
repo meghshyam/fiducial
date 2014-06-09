@@ -39,25 +39,25 @@
 
 \begin{abstract}
 
-  Fiducials are commonly placed in environments to provide a
-  uniquely identifiable object in the scene.  In quadcopter
-  applications, these fiducials are often used to evaluate planning
-  algorithms given that ground truth positions can be
-  detected from the quadcopter's camera. 
+Fiducials are commonly placed in environments to provide a
+uniquely identifiable object in the scene.  In quadcopter
+applications, these fiducials are often used to evaluate planning
+algorithms given that ground truth positions can be
+detected from the quadcopter's camera.
 
-  Low cost quadcopters, however, are subject to quick and unstable
-  motions that can cause significant motion blur that severely affects
-  the detection rate of existing fiducials. This problem
-  motivated us to design a fiducial that is robust to motion blur. Our
-  proposed design uses concentric circles with the observation that
-  the direction perpendicular to the motion blur direction will be
-  relatively unaffected by the blur. As a result, an appropriate
-  fiducial code orthogonal to the blur direction can be
-  recognized. Since the direction of motion blur is unknown, the
-  circular design is good for all motion blur directions. We describe
-  the design of binary fiducials, and also a detection
-  algorithm.  We show that our marker can significantly outperform
-  existing fiducials in scenes captured with a quadcopter.
+Low cost quadcopters, however, are subject to quick and unstable
+motions that can cause significant motion blur that severely affects
+the detection rate of existing fiducials. This problem
+motivated us to design a fiducial that is robust to motion blur. Our
+proposed design uses concentric circles with the observation that
+the direction perpendicular to the motion blur direction will be
+relatively unaffected by the blur. As a result, an appropriate
+fiducial code orthogonal to the blur direction can be
+recognized. Since the direction of motion blur is unknown, the
+circular design is good for all motion blur directions. We describe
+the design of binary fiducials, and also a detection
+algorithm.  We show that our marker can significantly outperform
+existing fiducials in scenes captured with a quadcopter.
 
 \end{abstract}
 
@@ -715,7 +715,7 @@ proposed method.  From the images in the top rows of
 Figure~\ref{fig:BLUT_compare_00} and Figure~\ref{fig:BLUT_compare_01},
 we can see that BLUT is able to track the fiducial when the position
 of fiducial does not change too much in successive frames. Also, it
-can be seen that once BLUT looses track of the fiducial, it is not
+can be seen that once BLUT loses track of the fiducial, it is not
 able to recover. Since our approach detects the code in each frame,
 large changes in the patterns position is not an issue.  Some of our
 detection results are also shown in Figure~\ref{fig:BLUT_compare_00}
@@ -768,7 +768,7 @@ the  position of the fiducial between successive frames.
 \caption{\textbf{Top:} Output of BLUT~\cite{Wu:2011}. \textbf{Bottom:}
   Output of our algorithm on the same image 
   sequence. BLUT is able to track the fiducial till the third frame,
-  but from the fourth frame onwards, BLUT looses track. In the first
+  but from the fourth frame onwards, BLUT loses track. In the first
   three frames, the size of the  bounding box is low, but in the fourth
   and fifth frame it is large, indicating a sudden forward movement
   of the quadcopter.} 
@@ -809,7 +809,7 @@ the  position of the fiducial between successive frames.
 \caption{{\bf Top:} Output of BLUT~\cite{Wu:2011} on a sequence containing
 the ``01'' binary coded fiducial. {\bf Bottom:} Output of our
 algorithm on the same image 
-sequence. BLUT looses  track from the third frame onwards.}
+sequence. BLUT loses  track from the third frame onwards.}
 \label{fig:BLUT_compare_01}
 \end{figure*}
 
@@ -847,7 +847,7 @@ sequence. BLUT looses  track from the third frame onwards.}
 \end{subfigure}
 \caption{Top: Output of BLUT~\cite{Wu:2011} on sample image sequence containing
 ``10'' binary coded fiducial. Bottom: Output of our algorithm on the same image
-sequence. From the second frame, BLUT looses track.}
+sequence. From the second frame, BLUT loses track.}
 \label{fig:BLUT_compare_10}
 \end{figure*}
 
