@@ -74,7 +74,7 @@ placed~\cite{Bosnak:2012,Lim09,Klopschitz:2007}
  in the environment to provide additional information that
 serves for ground-truth positional measurements.
 
-In order to be effective, fiducials (or simply, fiducials) need
+In order to be effective, fiducial markers (or simply, fiducials) need
 to be easily detected in the scene. A variety of fiducials have
 been proposed~\cite{NaimarkF02,ARToolkit02,Fiala05,Pitag13,runetag11}
 in the literature.  These take the form of binary codes arranged into
@@ -84,8 +84,8 @@ patterns~\cite{NaimarkF02,Pitag13,runetag11}.  Figure \ref{fig:teaser}
 shows the popular ARTag \cite{Fiala05} fiducial as possibly seen from
 a quadcopter. A problem for existing fiducials is that low-cost
 quadcopters often exhibit very quick and erratic physical movements
-that result in motion blur in the quadcopter's onboard camera. This
-motion blur has an adverse effect on the recognition of fiducial
+that result in motion blur in the captured images from the quadcopter's onboard
+camera. This motion blur has an adverse effect on the recognition of fiducial
 markers. This can be seen in Figure \ref{fig:teaser}--(b) where the
 ARTag fiducial cannot be recognized due to motion blur. This is not
 too surprising as most existing fiducials are not designed to handle
@@ -221,7 +221,7 @@ and such algorithms break down under motion blur.}
 %respect to processing time, recognition rate and accuracy with
 %respect to viewing angle and distance.
 
-{\textbf{Tracking}}~~Fiducial detection between successive video
+{\textbf{Tracking:}}~~Fiducial detection between successive video
 frames can be considered as a tracking problem where the tracked
 object is the fiducial.  There is a very large body of research
 dedicated to tracking and interested readers are referred
@@ -253,7 +253,7 @@ algorithm used to find the fiducial in an image, or a video sequence.
 
 \subsection{Prior Fiducials Under Motion Blur}\label{sec:blurtest}
 
-Here we examine the the performance of two popular fiducials under
+Here we examine the performance of two popular fiducials under
 motion blur.  Specifically we examine ARTags ~\cite{Fiala05} and
 PiTags~\cite{Pitag13} given their differences in geometric design and
 the availability of an API to develop applications to recognize the tags.
@@ -376,7 +376,7 @@ and classify the fiducial.
 \end{figure*}
 
 %\noindent Details of each of the steps are as follows:\\
-\textbf{Gabor filter}~~A 2D Gabor filter is a Gaussian kernel function
+\textbf{Gabor filter:}~~A 2D Gabor filter is a Gaussian kernel function
 modulated by a sinusoidal plane wave~\cite{Kruizinga:2002}. It is used to find
 high gradient patches. In our case, it is used to detect portions
 of the circular fiducials that were not affected by the blur.
@@ -390,13 +390,13 @@ $\ell^2$-normalized image is thresholded with threshold set to $0.4$ (on scale o
 one).  For further details to the Gabor filter, see~\cite{Kruizinga:2002}.
 %% MBS - is the Kruizinga filter reasonable to cite?
 
-\textbf{Clustering}~~The binarized Gabor filter responses are
+\textbf{Clustering:}~~The binarized Gabor filter responses are
 treated as a set of connected components in the image.   Clustering
 is used to find components that are located in a close spatial region.  We do
 this via hierarchical clustering~\cite{ALGLIB} using unweighted
 average linkage with a distance threshold set to 150.
 
-\textbf{PCA}~~For each clustered set of components, we apply
+\textbf{PCA:}~~For each clustered set of components, we apply
 PCA to determine the dominant direction.  This is done by examining
 the orientation of the first principal component.  We then extract an
 intensity profile patch in the input image along this direction as it
@@ -411,7 +411,7 @@ region as a potential fiducial.  Clustered components that have
 allowable transitions counts and transitions with uniform widths are
 further considered for classification to determine the binary code.
 
-\textbf{Classification}~~As mentioned above, a small image patch
+\textbf{Classification:}~~As mentioned above, a small image patch
 containing the intensity profile of the fiducial is used to identify
 which of the many fiducials might be present and is represented by a
 code.  We found that a training-based method using the k nearest
@@ -487,7 +487,7 @@ second.
 \end{figure}
 
 Our system has also been tested on images containing multiple fiducial
-patterns in the same frame. Our algorithm can successfully detected
+patterns in the same frame. Our algorithm successfully detected
 all fiducials as well as correctly classified them as shown in
 Figure \ref{fig:output_all}.
 
@@ -522,7 +522,7 @@ blur scales.
   \label{fig:blur_maximum}
 \end{figure}
 
-Qualitatively we see in Figure~\ref{fig:blur_maximum} that despite
+Qualitatively we see in Figure~\ref{fig:blur_maximum} that despite of
 even more blur than earlier described (50 units or more) detection is
 still feasible and practical.  Quantitatively, the comparison of
 recognition rate is shown in Figure~\ref{fig:recognition_rate}.
@@ -652,7 +652,7 @@ Recognition rate of ARTag and proposed fiducials on real
 
 In another setup we arranged our fiducials on four sides of a box and
 revolved the quadcopter around the box. Later, we repeated the process
-by replacing our fiducial by ARTags. Figure~\ref{fig:setup} some
+by replacing our fiducial by ARTags. Figure~\ref{fig:setup} shows some
 frames from this sequence as well as the performance of both
 fiducials. The overall detection rate of our tags is 90\% while that
 of ARTags is only around 60\%.
@@ -717,7 +717,7 @@ we can see that BLUT is able to track the fiducial when the position
 of fiducial does not change too much in successive frames. Also, it
 can be seen that once BLUT loses track of the fiducial, it is not
 able to recover. Since our approach detects the code in each frame,
-large changes in the patterns position is not an issue.  Some of our
+large changes in the pattern's position is not an issue.  Some of our
 detection results are also shown in Figure~\ref{fig:BLUT_compare_00}
 and Figure~\ref{fig:BLUT_compare_01}.
 
@@ -909,7 +909,7 @@ is required or an alternative strategy for detection is required.
 %\noindent\textbf{False Negatives}~~
 
 We found that sometimes our detection algorithm fails to recognize the
-``00'' fiducial, when there is severe blur.  The is because when there
+``00'' fiducial, when there is severe blur.  This is because when there
 is too much blur, the innermost ring's response in the Gabor output is
 too low and not detected properly.  This problem can be resolved by
 increasing the radius of innermost ring to reduce the effect of blur
@@ -930,7 +930,7 @@ may not require simultaneous use of a large number of fiducials.  Most
 of the time, it is sufficient to have 4-6 different
 fiducials. Nevertheless, we may be able to generate a larger number of
 fiducials by using color backgrounds. This is an area of interest for
-further investigation.
+further research.
 
 \section{Conclusion}
 
