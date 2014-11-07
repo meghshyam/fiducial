@@ -97,7 +97,7 @@ patterns~\cite{NaimarkF02,Pitag13,runetag11}.  Figure \ref{fig:teaser}
 shows the popular ARTag \cite{Fiala05} fiducial as possibly seen from
 a quadcopter. A problem for existing fiducials is that low-cost
 quadcopters often exhibit very quick and erratic physical movements
-that result in motion blur in the captured images from the quadcopter's onboard
+that result in motion blur evidenced in the images captured from the quadcopter's onboard
 camera. This motion blur has an adverse effect on the recognition of fiducial
 markers. This can be seen in Figure \ref{fig:teaser}--(b) where the
 ARTag fiducial cannot be recognized due to motion blur. This is not
@@ -535,15 +535,15 @@ blur scales.
   \label{fig:blur_maximum}
 \end{figure}
 
-Qualitatively we see in Figure~\ref{fig:blur_maximum} that despite of
-even more blur than earlier described (50 units or more) detection is
+Qualitatively, we see in Figure~\ref{fig:blur_maximum} that despite of
+even more blur than earlier described (50 units or more), detection is
 still feasible and practical.  Quantitatively, the comparison of
 recognition rate is shown in Figure~\ref{fig:recognition_rate}.
 Even under more severe blur, of 65 pixels, the algorithm is
 successful.  Our recognition is 100\% for all codes except the ``00''
 which is undetectable after 50 pixels blur (which is still
 significantly better than ARTag).  Reasons for the lower performance
-when``00'' tags are present is discussed in
+when``00'' tags are present, is discussed in
 Section~\ref{sec:discussion}.
 
 \begin{figure}[h!]
@@ -636,7 +636,7 @@ captured with the quadcopter camera. In each test dataset, we have
 used different two bit binary coded fiducial and recorded video of
 around two minute duration (i.e., around 1000 frames).  The quadcopter
 was flown in a routine manner in the room with its camera facing the
-wall (see supplementary videos). The comparison of the recognition
+wall. The comparison of the recognition
 rate is shown in Table~\ref{tab:recognition_accuracy}. Recognition
 rate of our fiducials ranges from 86.5\% to 94.1\%, while the ARTag is
 60.3\% to 65.6\%.  Classification accuracy of all fiducials (ARTag as
@@ -664,8 +664,8 @@ Recognition rate of ARTag and proposed fiducials on real
 \end{table}
 
 In another setup we arranged our fiducials on four sides of a box and
-revolved the quadcopter around the box. Later, we repeated the process
-by replacing our fiducial by ARTags. Figure~\ref{fig:setup} shows some
+revolved the quadcopter around the box (see the supplementary video). Later, we
+repeated the process by replacing our fiducial by ARTags. Figure~\ref{fig:setup} shows some
 frames from this sequence as well as the performance of both
 fiducials. The overall detection rate of our tags is 90\% while that
 of ARTags is only around 60\%.
