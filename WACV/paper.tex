@@ -37,11 +37,11 @@
 \title{A Motion Blur Resilient Fiducial For Quadcopter Imaging}
 
 \author{Meghshyam G. Prasad\\
-IIT Bombay\\
+Dept. of Computer Science, IIT Bombay\\
 {\tt\small meghshyam@cse.iitb.ac.in}
 \and
 Sharat Chandran\\
-IIT Bombay\\
+Dept. of Computer Science, IIT Bombay\\
 {\tt\small sharat@cse.iitb.ac.in}
 \and
 Michael S. Brown\\
@@ -471,9 +471,9 @@ can classify the pattern as class 0 or the maximum class containing all 1s.
 
 We have implemented our algorithm in C++ using the OpenCV library.
 Experiments were performed on a laptop with Intel Core i7
-processor(@3.4GHz) and 4GB RAM.  Source code to generate and recognize
-the code, as well as the data sets used in this paper will be made
-publicly available.
+processor(@3.4GHz) and 4GB RAM. (Please check author's webpage
+\url{http://www.comp.nus.edu.sg/~mgprasad/fiducial/} for details of source code
+and all datasets)
 %Video clips of collected data are provided in the supplementary
 %material.
 % Meghshyam: Is it a desktop PC or a laptop?
@@ -494,8 +494,8 @@ second.
 
   \includegraphics[width=0.4\linewidth]{images/output_10.jpg}
   \includegraphics[width=0.4\linewidth]{images/output_11.jpg}
-  \caption{Sample outputs. The class label shown is the decimal equivalent
-  of the binary coded fiducial.}
+  \caption{Output of our fiducial detection algorithm on sample images. The
+  class label shown is the decimal equivalent of the binary coded fiducial.}
   \label{fig:out_outputs}
 \end{figure}
 
@@ -664,8 +664,8 @@ Recognition rate of ARTag and proposed fiducials on real
 \end{table}
 
 In another setup we arranged our fiducials on four sides of a box and
-revolved the quadcopter around the box (see the supplementary video). Later, we
-repeated the process by replacing our fiducial by ARTags. Figure~\ref{fig:setup} shows some
+revolved the quadcopter around the box (See video uploaded at \cite{video}).
+Later, we repeated the process by replacing our fiducial by ARTags. Figure~\ref{fig:setup} shows some
 frames from this sequence as well as the performance of both
 fiducials. The overall detection rate of our tags is 90\% while that
 of ARTags is only around 60\%.
