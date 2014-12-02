@@ -131,6 +131,7 @@ int main(int argc, char* argv[])
 	CvKNearest knn(trainingData, response, Mat(), false, K);
 
 	Mat output = input.clone();
+	bool found_one = false;
 	for(int i=0; i<numClusters; i++)
 	{
 		float * row = (float *)&clusters.at<float>(i,0);
@@ -161,6 +162,7 @@ int main(int argc, char* argv[])
 		string str = "Class:";
 		if(found)
 		{
+			found_one=true;
 			rectangle(output, pt1, pt2, Scalar(0,255,0), 3);
 			if(num_rings ==1 ){
 				Mat sample(1, 100, DataType<float>::type);
@@ -180,18 +182,18 @@ int main(int argc, char* argv[])
 				Mat dist(K, 1, DataType<float>::type);
 				knn.find_nearest (sample, K, results, responses, dist);
 				int class_id = results.at<float>(0);
-				cout<<"Class:"<<class_id<<"\n";
+				cout<<"Class:"<<class_id;
 				classid[0] = class_id+48;
 				classid[1] = '\0';
 				str.append(classid);
 			}
 			else{
 				if(num_rings == 0){
-					cout<<"Class:"<<0<<"\n";
+					cout<<"Class:0";
 					str.append("0");
 				}
 				else if(num_rings == 2){
-					cout<<"Class:"<<3<<"\n";
+					cout<<"Class:3";
 					str.append("3");
 				}
 			}
@@ -200,18 +202,19 @@ int main(int argc, char* argv[])
 			rectangle(output,pt_text_start, pt_text_end, Scalar(0,255,255),-1);
 			putText(output, str, pt2, FONT_HERSHEY_DUPLEX, 0.75, Scalar(0,0,255));
 			circle(output, center, 1, Scalar(0,0,255), -1, 8, 0);
-			break;
+			//break;
 		}
 	}
 	//imshow("output", output);
 	waitKey();
-	cout<<"Center:"<<center<<"\n";
+	//cout<<"Center:"<<center<<"\n";
 	imwrite("output.jpg", output);
-	if(!found){
+	if(!found_one){
 		cout<<"Code not detected\n";
 	}else{
 		//cout<<"Code detected\n";
 		//Classify the detected code
+		cout<<"\n";
 	}
 #else
 	int x1 = 0;
@@ -457,7 +460,7 @@ bool detectCode(const Mat &pts, int left, int top, int right, int bottom, const 
 	int size3 = ring_starts[2].size();
 
 	//if(size1 == size2 && size2 == size3){
-	if(size1 >= 4 && size2 >= 4 && size3 >= 4 && (size1 == size2 || size2 == size3))
+	if(size1 >= 3 && size2 >= 4 && size3 >= 3 && (size1 == size2 || size2 == size3))
 	{
 		/*
 			int* max_width = new int[size1];
@@ -502,7 +505,7 @@ bool detectCode(const Mat &pts, int left, int top, int right, int bottom, const 
 			}
 			else{
 				int diff_min_max = findDiffMinMax(ring_widths, size2, 0, 1);
-				if(diff_min_max > 7){
+				if(diff_min_max > 9){
 #ifdef DEBUG
 					imshow("lines", cloned_input);
 					waitKey();
@@ -528,7 +531,7 @@ bool detectCode(const Mat &pts, int left, int top, int right, int bottom, const 
 			}
 			else{
 				int diff_min_max = findDiffMinMax(ring_widths, size2, 1, 2);
-				if(diff_min_max > 5){
+				if(diff_min_max > 9){
 #ifdef DEBUG
 					imshow("lines", cloned_input);
 					waitKey();
